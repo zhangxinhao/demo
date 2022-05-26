@@ -1,9 +1,8 @@
 package thread;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class Pool {
     private ExecutorService executor;
@@ -16,14 +15,27 @@ public class Pool {
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_HOURS, TimeUnit.HOURS, new LinkedBlockingDeque<>(100));
     }
 
-    public void addTask(Runnable task) {
-        executor.execute(task);
+    public Future<?> addTask(Runnable task) {
+        return executor.submit(task);
     }
 
     public void begin() {
         init();
+        List<Future> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            addTask(new MyTask());
+            list.add(addTask(new MyTask()));
+        }
+        int num = 0;
+        for (Future future : list) {
+            num++;
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("num: " + num);
         }
     }
 
