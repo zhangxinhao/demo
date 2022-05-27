@@ -15,27 +15,27 @@ public class Pool {
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_HOURS, TimeUnit.HOURS, new LinkedBlockingDeque<>(100));
     }
 
-    public Future<?> addTask(Runnable task) {
+    public Future<String> addTask(Callable<String> task) {
         return executor.submit(task);
     }
 
     public void begin() {
         init();
-        List<Future> list = new ArrayList<>();
+        List<Future<String>> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             list.add(addTask(new MyTask()));
         }
         int num = 0;
-        for (Future future : list) {
+        for (Future<String> future : list) {
             num++;
             try {
-                future.get();
+                String str = future.get();
+                System.out.println("num: " + num + " str: " + str);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("num: " + num);
         }
     }
 
@@ -45,16 +45,17 @@ public class Pool {
 
     }
 
-    public class MyTask implements Runnable {
+    public class MyTask implements Callable<String> {
 
         @Override
-        public void run() {
+        public String call() {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
             System.out.println("ThreadName: "+Thread.currentThread().getName());
+            return "aaa";
         }
     }
 }
