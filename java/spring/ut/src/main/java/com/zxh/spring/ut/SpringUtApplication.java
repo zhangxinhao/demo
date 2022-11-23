@@ -1,4 +1,4 @@
-package com.zxh.spring.springut;
+package com.zxh.spring.ut;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

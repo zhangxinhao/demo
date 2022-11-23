@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.zxh.spring</groupId>
-    <artifactId>SpringUT</artifactId>
+    <artifactId>ut</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SpringUT</name>
     <description>SpringUT</description>
