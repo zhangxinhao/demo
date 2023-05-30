@@ -1,0 +1,10 @@
+{
+    "go.gopath": "/Users/zhangxinhao/code/test/demo/go",
+    "go.toolsEnvVars": {
+        "GOPATH": "/Users/zhangxinhao/code/test/demo/go",
+        "GO111MODULE": "on"
+    },
+    "gopls": {
+        "build.experimentalWorkspaceModule": true
+    }
+}
