@@ -13,6 +13,14 @@ func main() {
 			"message": "pong",
 		})
 	})
+	r.GET("/someJSON", func(context *gin.Context) {
+		data := map[string]interface{}{
+			"lang": "GO",
+			"tag":  "<br>",
+		}
+
+		context.AsciiJSON(http.StatusOK, data)
+	})
 	err := r.Run()
 	if err != nil {
 		return
