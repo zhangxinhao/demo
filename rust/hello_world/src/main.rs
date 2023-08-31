@@ -1,3 +1,6 @@
+// Execute: cargo run
 fn main() {
-    println!("Hello, world!");
+    for i in 1..6 {
+        println!("{}", i);
+    }
 }
