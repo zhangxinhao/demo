@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title or "首页" }}{% endblock %}
+
+{% block header %}
+<h1>{{ title or "欢迎来到我们的网站" }}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h2>用户信息</h2>
+    <div class="user-card">
+        <p><strong>姓名:</strong> {{ user.name }}</p>
+        <p><strong>年龄:</strong> {{ user.age }}岁</p>
+        <p><strong>邮箱:</strong> {{ user.email }}</p>
+        <p><strong>状态:</strong> 
+            {% if user.is_active %}
+                <span style="color: green;">活跃</span>
+            {% else %}
+                <span style="color: red;">非活跃</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    <h2>站点特色</h2>
+    <ul>
+        <li>响应式设计</li>
+        <li>现代化界面</li>
+        <li>高性能</li>
+    </ul>
+</div>
+{% endblock %}

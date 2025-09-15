@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{# 定义表单宏 #}
+{% macro input_field(name, label, type="text", placeholder="", required=false) %}
+<div class="form-group">
+    <label for="{{ name }}">{{ label }}</label>
+    <input type="{{ type }}" 
+           id="{{ name }}" 
+           name="{{ name }}" 
+           placeholder="{{ placeholder }}"
+           {% if required %}required{% endif %}
+           class="form-control">
+</div>
+{% endmacro %}
+
+{% macro select_field(name, label, options, required=false) %}
+<div class="form-group">
+    <label for="{{ name }}">{{ label }}</label>
+    <select id="{{ name }}" name="{{ name }}" class="form-control" {% if required %}required{% endif %}>
+        {% for value, text in options %}
+        <option value="{{ value }}">{{ text }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endmacro %}
+
+{% macro checkbox_field(name, label, checked=false) %}
+<div class="form-group checkbox-group">
+    <input type="checkbox" id="{{ name }}" name="{{ name }}" {% if checked %}checked{% endif %}>
+    <label for="{{ name }}">{{ label }}</label>
+</div>
+{% endmacro %}
+
+{% block title %}表单演示{% endblock %}
+
+{% block header %}
+<h1>Jinja2 宏功能演示</h1>
+{% endblock %}
+
+{% block content %}
+<div class="forms-section">
+    <h2>用户注册表单</h2>
+    <form class="demo-form">
+        {{ input_field("username", "用户名", placeholder="请输入用户名", required=true) }}
+        {{ input_field("email", "邮箱地址", type="email", placeholder="example@email.com", required=true) }}
+        {{ input_field("password", "密码", type="password", required=true) }}
+        
+        {% set age_options = [
+            ("18-25", "18-25岁"),
+            ("26-35", "26-35岁"),
+            ("36-50", "36-50岁"),
+            ("50+", "50岁以上")
+        ] %}
+        {{ select_field("age_range", "年龄段", age_options, required=true) }}
+        
+        {{ checkbox_field("newsletter", "订阅邮件通讯") }}
+        {{ checkbox_field("terms", "同意用户协议", checked=true) }}
+        
+        <button type="submit" class="btn-submit">注册</button>
+    </form>
+    
+    <h2>产品反馈表单</h2>
+    <form class="demo-form">
+        {{ input_field("product_name", "产品名称", placeholder="请输入产品名称") }}
+        
+        {% set rating_options = [
+            ("5", "非常满意 (5星)"),
+            ("4", "满意 (4星)"),
+            ("3", "一般 (3星)"),
+            ("2", "不满意 (2星)"),
+            ("1", "非常不满意 (1星)")
+        ] %}
+        {{ select_field("rating", "满意度评价", rating_options) }}
+        
+        <div class="form-group">
+            <label for="feedback">详细反馈</label>
+            <textarea id="feedback" name="feedback" rows="4" class="form-control" placeholder="请输入您的反馈意见..."></textarea>
+        </div>
+        
+        {{ checkbox_field("recommend", "愿意推荐给朋友") }}
+        
+        <button type="submit" class="btn-submit">提交反馈</button>
+    </form>
+    
+    <h2>宏的优势说明</h2>
+    <div class="macro-benefits">
+        <ul>
+            <li><strong>代码复用:</strong> 避免重复编写相同的HTML结构</li>
+            <li><strong>参数化:</strong> 通过参数自定义表单字段属性</li>
+            <li><strong>一致性:</strong> 确保整个应用的表单样式统一</li>
+            <li><strong>维护性:</strong> 集中管理表单组件，便于维护和更新</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+.forms-section {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.demo-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #dee2e6;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #495057;
+}
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+}
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+.checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
+    width: auto;
+}
+.btn-submit {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.btn-submit:hover {
+    background-color: #0056b3;
+}
+.macro-benefits {
+    background: #e7f3ff;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+.macro-benefits ul {
+    margin: 0;
+    padding-left: 20px;
+}
+.macro-benefits li {
+    margin-bottom: 8px;
+}
+</style>
+{% endblock %}

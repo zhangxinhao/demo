@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}默认标题{% endblock %}</title>
+</head>
+<body>
+  <header>{% block header %}<h1>站点标题</h1>{% endblock %}</header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    {% block footer %}© {{ year }}{% endblock %}
+  </footer>
+</body>
+</html>

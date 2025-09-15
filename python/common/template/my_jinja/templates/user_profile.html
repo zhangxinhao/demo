@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }}的个人资料{% endblock %}
+
+{% block header %}
+<h1>个人资料</h1>
+{% endblock %}
+
+{% block content %}
+<div class="profile-section">
+    <div class="user-profile">
+        <h2>{{ user.name }}</h2>
+        
+        <div class="profile-details">
+            <div class="detail-row">
+                <label>年龄:</label>
+                <span>{{ user.age }}岁</span>
+            </div>
+            
+            <div class="detail-row">
+                <label>邮箱:</label>
+                <span>{{ user.email }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <label>账户状态:</label>
+                {% if user.is_active %}
+                    <span class="status-active">✓ 活跃用户</span>
+                {% else %}
+                    <span class="status-inactive">✗ 非活跃用户</span>
+                {% endif %}
+            </div>
+            
+            <!-- 年龄段分类演示 -->
+            <div class="detail-row">
+                <label>年龄段:</label>
+                <span>
+                {% if user.age < 18 %}
+                    未成年人
+                {% elif user.age < 30 %}
+                    青年人
+                {% elif user.age < 50 %}
+                    中年人
+                {% else %}
+                    长者
+                {% endif %}
+                </span>
+            </div>
+            
+            <!-- 邮箱域名提取演示 -->
+            <div class="detail-row">
+                <label>邮箱服务商:</label>
+                <span>{{ user.email.split('@')[1] if '@' in user.email else '未知' }}</span>
+            </div>
+        </div>
+        
+        <!-- 权限提示演示 -->
+        <div class="permissions">
+            <h3>用户权限</h3>
+            {% if user.is_active %}
+                {% if user.age >= 18 %}
+                    <p>✓ 完整访问权限</p>
+                    <p>✓ 可进行购买操作</p>
+                    <p>✓ 可发表评论</p>
+                {% else %}
+                    <p>✓ 基础访问权限</p>
+                    <p>✗ 需要监护人同意购买</p>
+                    <p>✓ 可发表评论(需审核)</p>
+                {% endif %}
+            {% else %}
+                <p>✗ 账户已被限制</p>
+                <p>请联系管理员激活账户</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.user-profile {
+    max-width: 500px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background: #f8f9fa;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 8px;
+    background: white;
+    border-radius: 5px;
+}
+.detail-row label {
+    font-weight: bold;
+    color: #333;
+}
+.status-active {
+    color: green;
+    font-weight: bold;
+}
+.status-inactive {
+    color: red;
+    font-weight: bold;
+}
+.permissions {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e9ecef;
+    border-radius: 5px;
+}
+.permissions h3 {
+    margin-top: 0;
+}
+</style>
+{% endblock %}
