@@ -2,3 +2,4 @@
 .env
 /docs/my_sphinx/docs/build/
 /docs/my_mkdocs/my-project/site/
+/data/my_meili/data/
