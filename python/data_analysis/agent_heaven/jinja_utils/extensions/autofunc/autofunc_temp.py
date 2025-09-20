@@ -13,10 +13,10 @@ TODO：
 import inspect
 from typing import List, Dict, Any, Callable
 
-from utils.jinja_utils import load_jinja_env
-from utils.llm_utils import MockLLM
-from utils.md_utils import parse_md
-from utils.func_utils import get_func_spec
+from jinja_utils.utils.jinja_utils import load_jinja_env
+from jinja_utils.utils.llm_utils import MockLLM
+from jinja_utils.utils.md_utils import parse_md
+from jinja_utils.utils.func_utils import get_func_spec
 
 
 def autofunc(examples: List[Dict[str, Any]] = None, hints: List[str] = None, **llm_kwargs) -> Callable:
