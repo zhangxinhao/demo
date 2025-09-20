@@ -1,0 +1,23 @@
+{#-
+Required:
+    db_name (str): Database name.
+    table_name (str): Table name.
+    table_info (str): Detailed table information.
+    column_name (str): Column name.
+    column_info (str): Detailed column information.
+Optional:
+    None.
+Dependency:
+    None.
+-#}
+{% trans %}Given the following database schema information:{% endtrans %}
+{{ db_name }}
+{% trans %}Detailed information of table{% endtrans %} '{{ table_name }}':
+{{ table_info }}
+{% trans %}Detailed information of column{% endtrans %} '{{ column_name }}' {% trans %}in{% endtrans %} '{{ table_name }}':
+{{ column_info }}
+{% trans %}Create a concise, practical description (1-2 sentences) for column{% endtrans %} '{{ column_name }}' {% trans %}that would help a SQL developer:{% endtrans %}
+1. {% trans %}Understand the column's purpose and key content{% endtrans %}
+2. {% trans %}Write valid queries without needing to examine the schema further{% endtrans %}
+3. {% trans %}Avoid common usage mistakes{% endtrans %}
+{% trans %}Provide only the description text itself, without any additional commentary or formatting.{% endtrans %}
