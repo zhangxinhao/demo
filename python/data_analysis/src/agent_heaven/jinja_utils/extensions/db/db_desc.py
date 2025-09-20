@@ -5,14 +5,8 @@ from agent_heaven.jinja_utils.utils.jinja_utils import load_jinja_env
 from agent_heaven.jinja_utils.utils.llm_utils import MockLLM
 
 
-def get_db_info():
+def get_db_info(db_data):
     """字符串拼接DB表当中的所有表的名字"""
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    json_file_path = os.path.join(current_dir, "db_info.json")
-
-    with open(json_file_path, "r", encoding="utf-8") as f:
-        db_data = json.load(f)
-
     db_name = db_data.get("name", db_data.get("id", "unknown"))
     tables = db_data.get("tables", {})
     table_names = list(tables.keys())
@@ -37,13 +31,10 @@ def get_column_info(col_name, col_meta):
     return column_info
 
 
-def db_desc(sql):
+def db_desc():
     """
     生成数据库、表和列的描述信息
-    
-    Args:
-        sql (str): SQL查询语句（当前版本暂未使用，预留参数）
-        
+
     Returns:
         dict: 包含数据库、表和列描述的字典
         {
@@ -70,7 +61,7 @@ def db_desc(sql):
         db_data = json.load(f)
 
     # 获取数据库信息
-    db_info = get_db_info()
+    db_info = get_db_info(db_data)
     db_name = db_data.get("name", db_data.get("id", "unknown"))
 
     # 加载Jinja2模板环境
@@ -144,3 +135,7 @@ def db_desc(sql):
             result["tables"][table_name]["columns"][column_name] = column_desc
 
     return result
+
+
+if __name__ == '__main__':
+    db_desc()
