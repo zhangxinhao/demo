@@ -6,3 +6,4 @@
 
 **/__pycache__/
 /data_analysis/data/log/
+/data_analysis/src/agent_heaven/jinja_utils/extensions/db/db_info.json
