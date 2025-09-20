@@ -59,7 +59,7 @@ def load_jinja_env(path: Optional[Union[str, List[str], Dict[str, str]]] = None,
     # 默认使用相对路径
     if path is None:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(current_dir, "resources")
+        path = os.path.join(current_dir, "../resources")
     
     # 根据path类型创建相应的加载器
     if isinstance(path, str):
