@@ -105,7 +105,7 @@ def load_jinja_env(path: Optional[Union[str, List[str], Dict[str, str]]] = None,
                         pass
     
     # 创建Jinja2环境，添加简化的翻译扩展
-    extensions = kwargs.get("extensions", [])
+    extensions = kwargs.get("../extensions", [])
     extensions.append(SimpleTransExtension)
     other_kwargs = {k: v for k, v in kwargs.items() if k != "extensions"}
     env = Environment(loader=loader, extensions=extensions, **other_kwargs)

@@ -1,4 +1,4 @@
-from jinja_utils import load_jinja_env
+from utils.jinja_utils import load_jinja_env
 
 # 使用默认路径
 env = load_jinja_env()
