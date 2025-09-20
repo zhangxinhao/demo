@@ -1,0 +1,23 @@
+{#-
+Required:
+    db_info (str): Database schema information.
+    table_name (str): Display name of the table.
+    table_info (str): Detailed table structure and constraints.
+Optional:
+    None.
+Dependency:
+    None.
+-#}
+{% trans %}Given the following database schema information:{% endtrans %}
+{{ db_info }}
+
+{% trans %}Detailed information of table{% endtrans %} '{{ table_name }}':
+{{ table_info }}
+
+{% trans %}Create a concise, practical description (1-2 sentences) for table{% endtrans %} '{{ table_name }}' {% trans %}that would help a SQL developer:{% endtrans %}
+1. {% trans %}Understand the table's purpose and key content{% endtrans %}
+2. {% trans %}Understand its relationships to other tables (if any){% endtrans %}
+3. {% trans %}Write valid queries without needing to examine the schema further{% endtrans %}
+4. {% trans %}Avoid common usage mistakes{% endtrans %}
+
+{% trans %}Provide only the description text itself, without any additional commentary or formatting.{% endtrans %}

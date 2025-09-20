@@ -1,0 +1,23 @@
+{#-
+Required:
+    db_info (str): Database schema information including tables, columns, relationships.
+Optional:
+    None
+Dependency:
+    None
+-#}
+{% trans %}You are an expert database analyst. Generate a concise, practical description (1-2 sentences) for the database that helps SQL developers understand its purpose, key content, and avoid common usage mistakes.{% endtrans %}
+
+## {% trans %}Database Schema:{% endtrans %}
+```
+{{ db_info }}
+```
+
+## {% trans %}Instructions:{% endtrans %}
+- {% trans %}Analyze the database schema information provided above{% endtrans %}
+- {% trans %}Create a 1-2 sentence description that covers the database's main purpose and key entities{% endtrans %}
+- {% trans %}Include important relationships or constraints that SQL developers should know{% endtrans %}
+- {% trans %}Mention any potential pitfalls or common query patterns{% endtrans %}
+- {% trans %}Provide only the description text without additional formatting or commentary{% endtrans %}
+
+## {% trans %}Database Description:{% endtrans %}
