@@ -2,7 +2,7 @@
 .env
 /docs/my_sphinx/docs/build/
 /docs/my_mkdocs/my-project/site/
-/data/my_meili/data/
+/data_analysis/my_meili/data/
 
 **/__pycache__/
 /data_analysis/data/log/
