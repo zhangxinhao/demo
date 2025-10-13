@@ -21,4 +21,9 @@ def get_greeting(name: str) -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(
+        transport="http",
+        host="0.0.0.0",  # Bind to all interfaces
+        port=9000,  # Custom port
+        log_level="DEBUG",  # Override global log level
+    )
