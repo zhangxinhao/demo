@@ -1,30 +1,45 @@
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain.agents import create_agent
+import asyncio
 
+from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+llm = init_chat_model(
+    model="openrouter/google/gemini-2.5-flash",
+    model_provider="openai",
+    base_url="http://127.0.0.1:9006",  # 自定义 base URL
+    api_key="sk-IXwQuAKWK_w14UPfzv6JQQ"
+)
 client = MultiServerMCPClient(
     {
-        "math": {
-            "transport": "stdio",  # Local subprocess communication
-            "command": "python",
-            # Absolute path to your math_server.py file
-            "args": ["/path/to/math_server.py"],
-        },
-        "weather": {
+        "demo": {
             "transport": "streamable_http",  # HTTP-based remote server
             # Ensure you start your weather server on port 8000
-            "url": "http://localhost:8000/mcp",
+            "url": "http://127.0.0.1:9000/mcp",
         }
     }
 )
 
-tools = await client.get_tools()
-agent = create_agent(
-    "anthropic:claude-3-7-sonnet-latest",
-    tools
-)
-math_response = await agent.ainvoke(
-    {"messages": [{"role": "user", "content": "what's (3 + 5) x 12?"}]}
-)
-weather_response = await agent.ainvoke(
-    {"messages": [{"role": "user", "content": "what is the weather in nyc?"}]}
-)
+
+async def main():
+    tools = await client.get_tools()
+    agent = create_agent(
+        llm,
+        tools
+    )
+    math_response = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": "what's 777+333=?"}]}
+    )
+
+    print(math_response)
+    print("==============")
+
+    weather_response = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": "有几个工具?"}]}
+    )
+
+    print(weather_response)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
