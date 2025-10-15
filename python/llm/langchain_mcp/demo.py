@@ -4,12 +4,19 @@ from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
-llm = init_chat_model(
+llm1 = init_chat_model(
     model="openrouter/google/gemini-2.5-flash",
     model_provider="openai",
     base_url="http://127.0.0.1:9006",  # 自定义 base URL
     api_key="sk-IXwQuAKWK_w14UPfzv6JQQ"
 )
+llm = init_chat_model(
+    model="claude-sonnet-4-5-20250929",
+    model_provider="anthropic",
+    base_url="https://globalai.vip",  # 自定义 base URL
+    api_key="sk-SWA3Td8L6b6nPHR5yU5zBc2lIUDGafWFbx57RJzkH4JZ77kr"
+)
+
 client = MultiServerMCPClient(
     {
         "demo": {
