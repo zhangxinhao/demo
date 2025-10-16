@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "langchain",
+#     "langchain-mcp-adapters",
+#     "requests",
+# ]
+# ///
 import asyncio
 
 from langchain.agents import create_agent
