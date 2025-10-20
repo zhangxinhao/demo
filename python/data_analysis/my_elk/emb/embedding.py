@@ -150,42 +150,39 @@ class MockEmbeddingModel:
         return results
 
 
-if __name__ == '__main__':
-
-    # 测试代码
-    print("=" * 60)
-    print("MockEmbeddingModel 测试")
-    print("=" * 60)
-
-    # 初始化模型
-    model = MockEmbeddingModel(embedding_dim=384)
-
-    # 测试1: 单个文本编码
+def demo_single_text_encoding(emb: MockEmbeddingModel):
+    """演示单个文本编码"""
     print("\n1. 单个文本编码:")
     text = "这是一个测试文本"
-    embedding = model.encode(text)
+    embedding = emb.encode(text)
     print(f"文本: {text}")
     print(f"向量维度: {embedding.shape}")
     print(f"向量前10个值: {embedding[:10]}")
 
-    # 测试2: 批量文本编码
+
+def demo_batch_encoding(emb: MockEmbeddingModel):
+    """演示批量文本编码"""
     print("\n2. 批量文本编码:")
     texts = ["苹果很好吃", "香蕉也不错", "我喜欢吃水果"]
-    embeddings = model.encode(texts)
+    embeddings = emb.encode(texts)
     print(f"文本数量: {len(texts)}")
     print(f"向量矩阵形状: {embeddings.shape}")
 
-    # 测试3: 相似度计算
+
+def demo_similarity_calculation(emb: MockEmbeddingModel):
+    """演示相似度计算"""
     print("\n3. 相似度计算:")
     text1 = "我喜欢吃苹果"
     text2 = "我喜欢吃香蕉"
     text3 = "今天天气真好"
-    sim1 = model.similarity(text1, text2)
-    sim2 = model.similarity(text1, text3)
+    sim1 = emb.similarity(text1, text2)
+    sim2 = emb.similarity(text1, text3)
     print(f"'{text1}' vs '{text2}': {sim1:.4f}")
     print(f"'{text1}' vs '{text3}': {sim2:.4f}")
 
-    # 测试4: 批量相似度计算
+
+def demo_batch_similarity(emb: MockEmbeddingModel):
+    """演示批量相似度计算"""
     print("\n4. 批量相似度计算:")
     query = "Python编程语言"
     candidates = [
@@ -195,24 +192,58 @@ if __name__ == '__main__':
         "机器学习很有趣",
         "Python用于数据科学"
     ]
-    similarities = model.batch_similarity(query, candidates)
+    similarities = emb.batch_similarity(query, candidates)
     print(f"查询: {query}")
     for i, (cand, sim) in enumerate(zip(candidates, similarities)):
         print(f"  {i + 1}. [{sim:.4f}] {cand}")
 
-    # 测试5: 找出最相似的文本
+
+def demo_find_most_similar(emb: MockEmbeddingModel):
+    """演示找出最相似的文本"""
     print("\n5. 找出最相似的文本 (Top 3):")
-    results = model.find_most_similar(query, candidates, top_k=3)
+    query = "Python编程语言"
+    candidates = [
+        "Python是一种编程语言",
+        "Java也是编程语言",
+        "我喜欢吃苹果",
+        "机器学习很有趣",
+        "Python用于数据科学"
+    ]
+    results = emb.find_most_similar(query, candidates, top_k=3)
     for rank, (idx, text, score) in enumerate(results, 1):
         print(f"  {rank}. [索引:{idx}, 分数:{score:.4f}] {text}")
 
-    # 测试6: 验证相同文本的一致性
+
+def demo_consistency_check(emb: MockEmbeddingModel):
+    """演示验证相同文本的一致性"""
     print("\n6. 验证相同文本的一致性:")
-    emb1 = model.encode("测试文本")
-    emb2 = model.encode("测试文本")
+    emb1 = emb.encode("测试文本")
+    emb2 = emb.encode("测试文本")
     print(f"两次编码是否完全相同: {np.allclose(emb1, emb2)}")
     print(f"余弦相似度: {np.dot(emb1, emb2):.6f}")
+
+
+def main():
+    """主函数入口 - 演示MockEmbeddingModel的各项功能"""
+    print("=" * 60)
+    print("MockEmbeddingModel 测试")
+    print("=" * 60)
+
+    # 初始化嵌入模型
+    emb = MockEmbeddingModel(embedding_dim=384)
+
+    # 执行各项功能演示
+    demo_single_text_encoding(emb)
+    demo_batch_encoding(emb)
+    demo_similarity_calculation(emb)
+    demo_batch_similarity(emb)
+    demo_find_most_similar(emb)
+    demo_consistency_check(emb)
 
     print("\n" + "=" * 60)
     print("测试完成！")
     print("=" * 60)
+
+
+if __name__ == '__main__':
+    main()
