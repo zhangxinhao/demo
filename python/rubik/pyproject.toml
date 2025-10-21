@@ -1,8 +1,7 @@
 [project]
-name = "python"
+name = "rubik"
 version = "0.1.0"
 description = "Add your description here"
+readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "langchain-anthropic>=0.3.22",
-]
+dependencies = []
