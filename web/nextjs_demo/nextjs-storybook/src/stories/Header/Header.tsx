@@ -1,5 +1,5 @@
-import { Button } from './Button';
-import './header.css';
+import { Button } from '../Button';
+import './Header.css';
 
 type User = {
   name: string;
@@ -52,3 +52,4 @@ export const Header = ({ user, onLogin, onLogout, onCreateAccount }: HeaderProps
     </div>
   </header>
 );
+
