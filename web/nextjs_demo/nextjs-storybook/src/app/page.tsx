@@ -1,54 +1,48 @@
-import Link from "next/link";
+"use client";
+
 import { Counter } from "@/components/Counter";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
 export default function Home() {
+  const [text, setText] = useState("");
+
+  const handleSubmit = () => {
+    console.log("Submitted text:", text);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-8">
-      <h1 className="text-3xl font-bold">Home Page</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8">
+      <h1 className="text-3xl font-bold mb-8">Home Page</h1>
 
-      {/* Zustand Counter Example */}
-      <Counter />
+      <Tabs defaultValue="counter" className="w-full max-w-md">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="counter">Counter</TabsTrigger>
+          <TabsTrigger value="editor">Editor</TabsTrigger>
+        </TabsList>
 
-      {/* shadcn-ui Button Variants Example */}
-      <section className="flex flex-col gap-4 items-center">
-        <h2 className="text-xl font-semibold">Button Variants</h2>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Button variant="default">Default</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="destructive">Destructive</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="link">Link</Button>
-        </div>
-      </section>
+        <TabsContent value="counter" className="mt-6">
+          <div className="flex justify-center">
+            <Counter />
+          </div>
+        </TabsContent>
 
-      {/* Button Sizes Example */}
-      <section className="flex flex-col gap-4 items-center">
-        <h2 className="text-xl font-semibold">Button Sizes</h2>
-        <div className="flex flex-wrap gap-3 items-center justify-center">
-          <Button size="sm">Small</Button>
-          <Button size="default">Default</Button>
-          <Button size="lg">Large</Button>
-        </div>
-      </section>
-
-      {/* Button States Example */}
-      <section className="flex flex-col gap-4 items-center">
-        <h2 className="text-xl font-semibold">Button States</h2>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Button>Normal</Button>
-          <Button disabled>Disabled</Button>
-        </div>
-      </section>
-
-      {/* Link with Button styling */}
-      <section className="flex flex-col gap-4 items-center">
-        <h2 className="text-xl font-semibold">Navigation</h2>
-        <Button asChild>
-          <Link href="/about">Go to About Page</Link>
-        </Button>
-      </section>
+        <TabsContent value="editor" className="mt-6">
+          <div className="flex flex-col gap-4">
+            <Textarea
+              placeholder="Enter your text here..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="min-h-[200px] resize-none"
+            />
+            <Button onClick={handleSubmit} className="w-full">
+              Submit
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
