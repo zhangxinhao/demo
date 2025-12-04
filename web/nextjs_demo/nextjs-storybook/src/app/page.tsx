@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Counter } from "@/components/Counter";
 
 export default function Home() {
   return (
@@ -13,6 +14,9 @@ export default function Home() {
       }}
     >
       <h1 style={{ fontSize: "24px" }}>Home Page</h1>
+
+      {/* Zustand Counter Example */}
+      <Counter />
 
       {/* Link component for client-side navigation */}
       <Link
