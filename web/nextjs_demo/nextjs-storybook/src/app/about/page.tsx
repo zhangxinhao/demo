@@ -1,6 +1,9 @@
-import Link from "next/link";
+"use client";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function About() {
+  const router = useRouter();
+
   return (
     <div
       style={{
@@ -12,22 +15,23 @@ export default function Home() {
         gap: "20px",
       }}
     >
-      <h1 style={{ fontSize: "24px" }}>Home Page</h1>
-
-      {/* Link component for client-side navigation */}
-      <Link
-        href="/about"
+      <h1 style={{ fontSize: "24px" }}>About Page</h1>
+      <p>This is the about page, demonstrating Next.js routing.</p>
+      <button
+        onClick={() => router.push("/")}
         style={{
           padding: "10px 20px",
           fontSize: "16px",
+          cursor: "pointer",
           backgroundColor: "#0070f3",
           color: "white",
+          border: "none",
           borderRadius: "4px",
-          textDecoration: "none",
         }}
       >
-        Go to About Page
-      </Link>
+        Go Back Home
+      </button>
     </div>
   );
 }
+
