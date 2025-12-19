@@ -3,4 +3,8 @@ books:
     add_prompt: true
     llm_process: true
     need_link: false
+  是什么缔造了汉江奇迹:
+    add_prompt: true
+    llm_process: false
+    need_link: false
 num_threads: 2

@@ -96,7 +96,7 @@ def save_chapters(output_dir: Path, chapters: list[str]) -> None:
     for i, chapter in enumerate(chapters, start=1):
         output_file = output_dir / f"{i}.txt"
         write_file(output_file, chapter)
-        logger.info(f"Saved: {output_file}")
+        logger.info(f"Saved: {output_file}, characters: {len(chapter)}")
 
 
 def process_book(book_file: Path, catalog_dir: Path, output_base_dir: Path) -> bool:
