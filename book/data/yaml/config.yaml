@@ -1,4 +1,6 @@
 books:
   当下的力量:
     completed: true
+    llm_process: false
     need_link: false
+num_threads: 2
