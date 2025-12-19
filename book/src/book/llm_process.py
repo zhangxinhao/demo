@@ -4,27 +4,38 @@
 """
 
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-import yaml
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from book.utils import (
+    get_src_dir,
+    get_txt_dir,
+    get_md_output_dir,
+    load_config,
+    save_config,
+    read_file,
+    write_file,
+    ensure_dir,
+    get_logger,
+    AppConfig,
+    BookConfig,
+)
 
-def get_project_root() -> Path:
-    """获取项目根目录"""
-    # 从src/book/llm_process.py往上两级
-    return Path(__file__).parent.parent.parent
+# 初始化 logger
+logger = get_logger("llm_process")
 
 
-def get_src_dir() -> Path:
-    """获取src目录"""
-    return Path(__file__).parent.parent
-
-
-def load_env():
-    """加载环境变量配置"""
+def load_env() -> tuple[str, str]:
+    """
+    加载环境变量配置
+    
+    Returns:
+        (api_key, model_name) 元组
+    """
     env_path = get_src_dir() / ".env"
     load_dotenv(env_path)
 
@@ -39,47 +50,29 @@ def load_env():
     return api_key, model_name
 
 
-def load_config(config_path: Path) -> dict:
-    """加载配置文件"""
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def save_config(config_path: Path, config: dict) -> None:
-    """保存配置文件"""
-    with open(config_path, "w", encoding="utf-8") as f:
-        yaml.dump(config, f, allow_unicode=True, default_flow_style=False)
-
-
-def get_books_to_process(books_config: dict) -> list[str]:
+def get_books_to_process(books_config: dict[str, BookConfig]) -> list[str]:
     """
     获取需要处理的书籍列表
-    筛选条件：completed=true 且 llm_process=false
+    筛选条件：add_prompt=true 且 llm_process=false
+    
+    Args:
+        books_config: 书籍配置字典
+    
+    Returns:
+        需要处理的书籍名称列表
     """
-    books_to_process = []
+    books_to_process: list[str] = []
     for book_name, book_info in books_config.items():
-        completed = book_info.get("completed", False)
+        add_prompt = book_info.get("add_prompt", False)
         llm_processed = book_info.get("llm_process", False)
 
-        if completed and not llm_processed:
+        if add_prompt and not llm_processed:
             books_to_process.append(book_name)
 
     return books_to_process
 
 
-def read_txt_file(file_path: Path) -> str:
-    """读取txt文件内容"""
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read()
-
-
-def save_result_file(file_path: Path, content: str) -> None:
-    """保存处理结果到文件"""
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-
-def call_llm(client: OpenAI, model_name: str, prompt: str) -> str:
+def call_llm(client: OpenAI, model_name: str, prompt: str) -> tuple[str, float]:
     """
     调用大模型API
     
@@ -89,9 +82,10 @@ def call_llm(client: OpenAI, model_name: str, prompt: str) -> str:
         prompt: 提示词内容
     
     Returns:
-        模型响应内容
+        (模型响应内容, 耗时秒数) 元组
     """
     try:
+        start_time = time.time()
         response = client.chat.completions.create(
             model=model_name,
             messages=[
@@ -102,9 +96,11 @@ def call_llm(client: OpenAI, model_name: str, prompt: str) -> str:
             ],
             extra_body={"reasoning": {"enabled": True}}
         )
-        return response.choices[0].message.content
+        elapsed_time = time.time() - start_time
+        logger.info(f"LLM call completed in {elapsed_time:.2f}s")
+        return response.choices[0].message.content, elapsed_time
     except Exception as e:
-        print(f"Error calling LLM: {e}")
+        logger.error(f"Error calling LLM: {e}")
         raise
 
 
@@ -113,7 +109,7 @@ def process_single_file(
         model_name: str,
         txt_file: Path,
         output_dir: Path
-) -> tuple[str, bool]:
+) -> tuple[str, bool, float]:
     """
     处理单个txt文件
     
@@ -124,28 +120,28 @@ def process_single_file(
         output_dir: 输出目录
     
     Returns:
-        (文件名, 是否成功)
+        (文件名, 是否成功, 耗时秒数)
     """
     file_name = txt_file.name
     try:
         # 读取文件内容作为提示词
-        prompt = read_txt_file(txt_file)
+        prompt = read_file(txt_file)
 
-        print(f"Processing file: {file_name}")
+        logger.info(f"Processing file: {file_name}")
 
         # 调用大模型
-        result = call_llm(client, model_name, prompt)
+        result, elapsed_time = call_llm(client, model_name, prompt)
 
         # 保存结果到md文件
         output_file = output_dir / f"{txt_file.stem}.md"
-        save_result_file(output_file, result)
+        write_file(output_file, result)
 
-        print(f"Completed: {file_name} -> {output_file.name}")
-        return file_name, True
+        logger.info(f"Completed: {file_name} -> {output_file.name} (took {elapsed_time:.2f}s)")
+        return file_name, True, elapsed_time
 
     except Exception as e:
-        print(f"Failed to process {file_name}: {e}")
-        return file_name, False
+        logger.error(f"Failed to process {file_name}: {e}")
+        return file_name, False, 0.0
 
 
 def process_book(
@@ -173,26 +169,27 @@ def process_book(
     book_txt_dir = txt_dir / book_name
 
     if not book_txt_dir.exists():
-        print(f"Warning: Directory not found for book '{book_name}': {book_txt_dir}")
+        logger.warning(f"Directory not found for book '{book_name}': {book_txt_dir}")
         return False
 
     # 获取所有txt文件
     txt_files = list(book_txt_dir.glob("*.txt"))
     if not txt_files:
-        print(f"Warning: No txt files found in {book_txt_dir}")
+        logger.warning(f"No txt files found in {book_txt_dir}")
         return False
 
     # 创建输出目录
     output_dir = output_base_dir / book_name
-    output_dir.mkdir(parents=True, exist_ok=True)
+    ensure_dir(output_dir)
 
-    print(f"Processing book: {book_name}")
-    print(f"Found {len(txt_files)} txt files")
-    print(f"Using {num_threads} threads")
+    logger.info(f"Processing book: {book_name}")
+    logger.info(f"Found {len(txt_files)} txt files")
+    logger.info(f"Using {num_threads} threads")
 
     # 使用线程池并发处理
     success_count = 0
     fail_count = 0
+    total_elapsed_time = 0.0
 
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         # 提交所有任务
@@ -211,33 +208,34 @@ def process_book(
         for future in as_completed(futures):
             txt_file = futures[future]
             try:
-                file_name, success = future.result()
+                file_name, success, elapsed_time = future.result()
                 if success:
                     success_count += 1
+                    total_elapsed_time += elapsed_time
                 else:
                     fail_count += 1
             except Exception as e:
-                print(f"Exception processing {txt_file.name}: {e}")
+                logger.error(f"Exception processing {txt_file.name}: {e}")
                 fail_count += 1
 
-    print(f"Book '{book_name}' processing complete: {success_count} success, {fail_count} failed")
+    # 计算平均耗时
+    avg_time = total_elapsed_time / success_count if success_count > 0 else 0.0
+    logger.info(f"Book '{book_name}' processing complete: {success_count} success, {fail_count} failed")
+    logger.info(f"Total LLM time: {total_elapsed_time:.2f}s, Average per file: {avg_time:.2f}s")
 
     return fail_count == 0
 
 
-def main():
+def main() -> None:
     """主函数"""
-    root = get_project_root()
-
     # 路径配置
-    config_path = root / "data" / "yaml" / "config.yaml"
-    txt_dir = root / "data" / "txt"
-    output_dir = root / "data" / "md"
+    txt_dir = get_txt_dir()
+    output_dir = get_md_output_dir()
 
     # 加载环境变量
-    print("Loading environment variables...")
+    logger.info("Loading environment variables...")
     api_key, model_name = load_env()
-    print(f"Using model: {model_name}")
+    logger.info(f"Using model: {model_name}")
 
     # 创建OpenAI客户端
     client = OpenAI(
@@ -246,8 +244,8 @@ def main():
     )
 
     # 加载配置
-    print("Loading config...")
-    config = load_config(config_path)
+    logger.info("Loading config...")
+    config: AppConfig = load_config()
     num_threads = config.get("num_threads", 2)
     books_config = config.get("books", {})
 
@@ -255,13 +253,13 @@ def main():
     books_to_process = get_books_to_process(books_config)
 
     if not books_to_process:
-        print("No books to process (requires completed=true and llm_process=false)")
+        logger.info("No books to process (requires add_prompt=true and llm_process=false)")
         return
 
-    print(f"Found {len(books_to_process)} books to process: {books_to_process}")
+    logger.info(f"Found {len(books_to_process)} books to process: {books_to_process}")
 
     # 处理每本书
-    processed_books = []
+    processed_books: list[str] = []
     for book_name in books_to_process:
         success = process_book(
             client=client,
@@ -281,8 +279,8 @@ def main():
             config["books"][book_name]["llm_process"] = True
 
     # 保存配置
-    save_config(config_path, config)
-    print(f"Config updated. Marked {len(processed_books)} books as llm_process=true")
+    save_config(config)
+    logger.info(f"Config updated. Marked {len(processed_books)} books as llm_process=true")
 
 
 if __name__ == "__main__":
