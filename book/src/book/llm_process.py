@@ -72,7 +72,7 @@ def get_books_to_process(books_config: dict[str, BookConfig]) -> list[str]:
     return books_to_process
 
 
-def call_llm(client: OpenAI, model_name: str, prompt: str) -> tuple[str, float]:
+def call_llm(client: OpenAI, model_name: str, prompt: str, file_name: str) -> tuple[str, float, int, int]:
     """
     调用大模型API
     
@@ -80,11 +80,16 @@ def call_llm(client: OpenAI, model_name: str, prompt: str) -> tuple[str, float]:
         client: OpenAI客户端
         model_name: 模型名称
         prompt: 提示词内容
+        file_name: 文件名（用于日志标识）
     
     Returns:
-        (模型响应内容, 耗时秒数) 元组
+        (模型响应内容, 耗时秒数, prompt_tokens, completion_tokens) 元组
     """
     try:
+        # 打印请求的字符数
+        prompt_chars = len(prompt)
+        logger.info(f"[{file_name}] Request prompt chars: {prompt_chars}")
+        
         start_time = time.time()
         response = client.chat.completions.create(
             model=model_name,
@@ -97,10 +102,15 @@ def call_llm(client: OpenAI, model_name: str, prompt: str) -> tuple[str, float]:
             extra_body={"reasoning": {"enabled": True}}
         )
         elapsed_time = time.time() - start_time
-        logger.info(f"LLM call completed in {elapsed_time:.2f}s")
-        return response.choices[0].message.content, elapsed_time
+        
+        # 获取 token 使用情况
+        prompt_tokens = response.usage.prompt_tokens if response.usage else 0
+        completion_tokens = response.usage.completion_tokens if response.usage else 0
+        
+        logger.info(f"[{file_name}] LLM call completed in {elapsed_time:.2f}s, prompt_tokens: {prompt_tokens}, completion_tokens: {completion_tokens}")
+        return response.choices[0].message.content, elapsed_time, prompt_tokens, completion_tokens
     except Exception as e:
-        logger.error(f"Error calling LLM: {e}")
+        logger.error(f"[{file_name}] Error calling LLM: {e}")
         raise
 
 
@@ -109,7 +119,7 @@ def process_single_file(
         model_name: str,
         txt_file: Path,
         output_dir: Path
-) -> tuple[str, bool, float]:
+) -> tuple[str, bool, float, int, int]:
     """
     处理单个txt文件
     
@@ -120,7 +130,7 @@ def process_single_file(
         output_dir: 输出目录
     
     Returns:
-        (文件名, 是否成功, 耗时秒数)
+        (文件名, 是否成功, 耗时秒数, prompt_tokens, completion_tokens)
     """
     file_name = txt_file.name
     try:
@@ -130,18 +140,18 @@ def process_single_file(
         logger.info(f"Processing file: {file_name}")
 
         # 调用大模型
-        result, elapsed_time = call_llm(client, model_name, prompt)
+        result, elapsed_time, prompt_tokens, completion_tokens = call_llm(client, model_name, prompt, file_name)
 
         # 保存结果到md文件
         output_file = output_dir / f"{txt_file.stem}.md"
         write_file(output_file, result)
 
         logger.info(f"Completed: {file_name} -> {output_file.name} (took {elapsed_time:.2f}s)")
-        return file_name, True, elapsed_time
+        return file_name, True, elapsed_time, prompt_tokens, completion_tokens
 
     except Exception as e:
         logger.error(f"Failed to process {file_name}: {e}")
-        return file_name, False, 0.0
+        return file_name, False, 0.0, 0, 0
 
 
 def process_book(
@@ -190,6 +200,8 @@ def process_book(
     success_count = 0
     fail_count = 0
     total_elapsed_time = 0.0
+    total_prompt_tokens = 0
+    total_completion_tokens = 0
 
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         # 提交所有任务
@@ -208,10 +220,12 @@ def process_book(
         for future in as_completed(futures):
             txt_file = futures[future]
             try:
-                file_name, success, elapsed_time = future.result()
+                file_name, success, elapsed_time, prompt_tokens, completion_tokens = future.result()
                 if success:
                     success_count += 1
                     total_elapsed_time += elapsed_time
+                    total_prompt_tokens += prompt_tokens
+                    total_completion_tokens += completion_tokens
                 else:
                     fail_count += 1
             except Exception as e:
@@ -222,6 +236,7 @@ def process_book(
     avg_time = total_elapsed_time / success_count if success_count > 0 else 0.0
     logger.info(f"Book '{book_name}' processing complete: {success_count} success, {fail_count} failed")
     logger.info(f"Total LLM time: {total_elapsed_time:.2f}s, Average per file: {avg_time:.2f}s")
+    logger.info(f"Total tokens - prompt: {total_prompt_tokens}, completion: {total_completion_tokens}, total: {total_prompt_tokens + total_completion_tokens}")
 
     return fail_count == 0
 
