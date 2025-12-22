@@ -4,7 +4,7 @@
 在 data/md 目录下的同名目录中生成 catalog.md
 """
 
-from book.utils import (
+from llm_editor.utils import (
     ensure_dir,
     get_catalog_dir,
     get_logger,

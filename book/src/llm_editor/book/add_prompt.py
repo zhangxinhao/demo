@@ -5,7 +5,7 @@
 
 from pathlib import Path
 
-from book.utils import (
+from llm_editor.utils import (
     get_txt_dir,
     get_prompt_dir,
     load_config,

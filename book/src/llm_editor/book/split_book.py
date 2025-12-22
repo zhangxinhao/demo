@@ -5,7 +5,7 @@
 import re
 from pathlib import Path
 
-from book.utils import (
+from llm_editor.utils import (
     get_book_dir,
     get_catalog_dir,
     get_txt_dir,

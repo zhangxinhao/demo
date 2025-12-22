@@ -11,7 +11,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from book.utils import (
+from llm_editor.utils import (
     get_src_dir,
     get_txt_dir,
     get_md_output_dir,
