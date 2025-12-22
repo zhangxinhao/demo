@@ -117,6 +117,11 @@ def add_prompt_to_articles(use_link_prompt: bool = True) -> None:
         # 读取原始内容
         content = txt_file.read_text(encoding="utf-8")
         
+        # 跳过空文件
+        if not content.strip():
+            print(f"跳过空文件: {txt_file.name}")
+            continue
+        
         # 判断文档语言并统计
         is_chinese = is_chinese_document(content)
         
