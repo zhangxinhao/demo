@@ -1,0 +1,14 @@
+# Head First Software Architecture
+# A appendix: leftovers
+# 1 Software Architecture Demystified
+# 2 Architectural Characteristics — Know Your Capabilities
+# 3 The Two Laws of Software Architecture — Everything’s a Trade-Off
+# 4 Logical Components — The Building Blocks
+# 5 Architectural Styles — Categorization and Philosophies
+# 6 Layered Architecture — Separating Concerns
+# 7 Modular Monoliths — Driven by the Domain
+# 8 Microkernel Architecture — Crafting Customizations
+# 9 Do It Yourself — The TripEZ Travel App
+# 10 Microservices Architecture — Bit by Bit
+# 11 Event-Driven Architecture — Asynchronous Adventures
+# 12 Do It Yourself — Testing Your Knowledge

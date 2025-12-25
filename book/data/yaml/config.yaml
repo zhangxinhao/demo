@@ -7,4 +7,8 @@ books:
     add_prompt: true
     llm_process: true
     need_link: false
+  深入浅出软件架构:
+    add_prompt: true
+    llm_process: true
+    need_link: false
 num_threads: 2
