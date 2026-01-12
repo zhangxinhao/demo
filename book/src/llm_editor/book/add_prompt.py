@@ -1,6 +1,6 @@
 """
 为书籍文本文件添加提示词
-遍历data/txt下的目录，根据config.yaml配置为每个txt文件添加对应的提示词
+遍历 data/book/txt 下的目录，根据 data/book/config.yaml 配置为每个txt文件添加对应的提示词
 """
 
 from pathlib import Path

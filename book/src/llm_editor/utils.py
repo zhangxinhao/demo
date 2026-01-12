@@ -39,34 +39,39 @@ def get_data_dir() -> Path:
     return get_project_root() / "data"
 
 
-def get_config_path() -> Path:
-    """获取配置文件路径"""
-    return get_data_dir() / "yaml" / "config.yaml"
-
-
-def get_txt_dir() -> Path:
-    """获取 txt 文件目录"""
-    return get_data_dir() / "txt"
-
-
-def get_book_dir() -> Path:
-    """获取书籍 MD 文件目录"""
+def get_book_base_dir() -> Path:
+    """获取 book 模块的基础目录 (data/book)"""
     return get_data_dir() / "book"
 
 
+def get_config_path() -> Path:
+    """获取配置文件路径 (data/book/config.yaml)"""
+    return get_book_base_dir() / "config.yaml"
+
+
+def get_txt_dir() -> Path:
+    """获取 txt 文件目录 (data/book/txt)"""
+    return get_book_base_dir() / "txt"
+
+
+def get_book_dir() -> Path:
+    """获取书籍 MD 文件目录 (data/book/book)"""
+    return get_book_base_dir() / "book"
+
+
 def get_catalog_dir() -> Path:
-    """获取目录文件目录"""
-    return get_data_dir() / "catalog"
+    """获取目录文件目录 (data/book/catalog)"""
+    return get_book_base_dir() / "catalog"
 
 
 def get_prompt_dir() -> Path:
-    """获取提示词目录"""
+    """获取提示词目录 (data/prompt)"""
     return get_data_dir() / "prompt"
 
 
 def get_md_output_dir() -> Path:
-    """获取 MD 输出目录"""
-    return get_data_dir() / "md"
+    """获取 MD 输出目录 (data/book/md)"""
+    return get_book_base_dir() / "md"
 
 
 def get_src_dir() -> Path:
@@ -81,7 +86,7 @@ def load_config(config_path: Path | None = None) -> AppConfig:
     加载配置文件
     
     Args:
-        config_path: 配置文件路径，默认使用 data/yaml/config.yaml
+        config_path: 配置文件路径，默认使用 data/book/config.yaml
     
     Returns:
         配置字典
@@ -99,7 +104,7 @@ def save_config(config: AppConfig, config_path: Path | None = None) -> None:
     
     Args:
         config: 配置字典
-        config_path: 配置文件路径，默认使用 data/yaml/config.yaml
+        config_path: 配置文件路径，默认使用 data/book/config.yaml
     """
     if config_path is None:
         config_path = get_config_path()

@@ -1,7 +1,7 @@
 """
 构建目录模块
-根据 data/catalog 目录下的目录 txt 文件
-在 data/md 目录下的同名目录中生成 catalog.md
+根据 data/book/catalog 目录下的目录 txt 文件
+在 data/book/md 目录下的同名目录中生成 catalog.md
 """
 
 from llm_editor.utils import (
