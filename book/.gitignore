@@ -3,7 +3,6 @@
 **/__pycache__/
 /data/md/
 /data/txt/
-/data/book/
 /data/article/md/
 /data/article/txt/
 /data/article/prompt_txt/
@@ -12,3 +11,4 @@
 /data/subtitle/txt/
 /data/epub/book/
 /data/epub/txt/
+/data/book/book/
