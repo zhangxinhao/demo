@@ -5,6 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "ebooklib>=0.20",
+    "lxml>=6.0.2",
     "openai>=2.14.0",
     "python-dotenv>=1.2.1",
     "pyyaml>=6.0.3",
@@ -17,5 +20,5 @@ package = true
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatchling.build.targets.wheel]
-packages = ["src/book"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_editor"]
