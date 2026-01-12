@@ -15,6 +15,10 @@ books:
     add_prompt: true
     llm_process: true
     need_link: false
+  百年孤独:
+    add_prompt: true
+    llm_process: true
+    need_link: false
   系统设计面试:
     add_prompt: true
     llm_process: true

@@ -1,5 +1,5 @@
 """
-根据目录文件切分书籍 MD 文件，生成多个 TXT 文件
+根据目录文件切分书籍文件（支持 MD 和 TXT 格式），生成多个 TXT 文件
 """
 
 import re
@@ -21,8 +21,10 @@ logger = get_logger("split_book")
 
 
 def get_book_files(book_dir: Path) -> list[Path]:
-    """获取 book 目录下所有的 md 文件"""
-    return list(book_dir.glob("*.md"))
+    """获取 book 目录下所有的书籍文件（支持 md 和 txt 格式）"""
+    md_files = list(book_dir.glob("*.md"))
+    txt_files = list(book_dir.glob("*.txt"))
+    return md_files + txt_files
 
 
 def get_catalog_file(catalog_dir: Path, book_name: str) -> Path | None:
@@ -112,6 +114,13 @@ def process_book(book_file: Path, catalog_dir: Path, output_base_dir: Path) -> b
         是否处理成功
     """
     book_name = book_file.stem  # 获取文件名（不含扩展名）
+    
+    # 检查目标目录是否已存在，如果存在则跳过
+    output_dir = output_base_dir / book_name
+    if output_dir.exists():
+        logger.info(f"Skipping {book_name}: output directory already exists")
+        return False
+    
     logger.info(f"Processing book: {book_name}")
 
     # 获取目录文件
@@ -138,7 +147,6 @@ def process_book(book_file: Path, catalog_dir: Path, output_base_dir: Path) -> b
         logger.warning(f"Expected {len(catalog)} chapters, got {len(chapters)}")
 
     # 创建输出目录
-    output_dir = output_base_dir / book_name
     ensure_dir(output_dir)
 
     # 保存章节
