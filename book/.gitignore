@@ -1,8 +1,8 @@
 # python
 .env
 **/__pycache__/
-/data/md/
-/data/txt/
+/data/book/md/
+/data/book/txt/
 /data/article/md/
 /data/article/txt/
 /data/article/prompt_txt/
