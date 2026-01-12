@@ -7,6 +7,16 @@
 import re
 from pathlib import Path
 
+from llm_editor.utils import (
+    get_subtitle_srt_dir,
+    get_subtitle_txt_dir,
+    ensure_dir,
+    write_file,
+    get_logger,
+)
+
+logger = get_logger("subtitle_extract")
+
 
 # ==================== SRT 格式处理 ====================
 
@@ -141,7 +151,7 @@ def process_subtitle_files(src_dir: Path, txt_dir: Path) -> None:
         txt_dir: txt 输出目录
     """
     # 确保输出目录存在
-    txt_dir.mkdir(parents=True, exist_ok=True)
+    ensure_dir(txt_dir)
 
     # 遍历所有 srt 文件
     srt_files = list(src_dir.glob('*.srt'))
@@ -150,12 +160,14 @@ def process_subtitle_files(src_dir: Path, txt_dir: Path) -> None:
 
     total_files = len(srt_files) + len(txt_subtitle_files)
     if total_files == 0:
-        print(f"No subtitle files found in {src_dir}")
+        logger.warning(f"No subtitle files found in {src_dir}")
         return
+
+    logger.info(f"Found {len(srt_files)} SRT files and {len(txt_subtitle_files)} TXT files")
 
     # 处理 srt 文件
     for srt_file in srt_files:
-        print(f"Processing SRT: {srt_file.name}")
+        logger.info(f"Processing SRT: {srt_file.name}")
 
         # 提取字幕文本
         subtitles = extract_text_from_srt(srt_file)
@@ -164,15 +176,14 @@ def process_subtitle_files(src_dir: Path, txt_dir: Path) -> None:
         output_file = txt_dir / f"{srt_file.stem}.txt"
 
         # 写入 txt 文件
-        with open(output_file, 'w', encoding='utf-8') as f:
-            for subtitle in subtitles:
-                f.write(subtitle + '\n')
+        content = '\n'.join(subtitles) + '\n'
+        write_file(output_file, content)
 
-        print(f"  -> Generated: {output_file.name} ({len(subtitles)} lines)")
+        logger.info(f"  -> Generated: {output_file.name} ({len(subtitles)} lines)")
 
     # 处理 txt 字幕文件
     for txt_file in txt_subtitle_files:
-        print(f"Processing TXT: {txt_file.name}")
+        logger.info(f"Processing TXT: {txt_file.name}")
 
         # 提取字幕文本
         subtitles = extract_text_from_txt_subtitle(txt_file)
@@ -181,29 +192,26 @@ def process_subtitle_files(src_dir: Path, txt_dir: Path) -> None:
         output_file = txt_dir / txt_file.name
 
         # 写入 txt 文件
-        with open(output_file, 'w', encoding='utf-8') as f:
-            for subtitle in subtitles:
-                f.write(subtitle + '\n')
+        content = '\n'.join(subtitles) + '\n'
+        write_file(output_file, content)
 
-        print(f"  -> Generated: {output_file.name} ({len(subtitles)} lines)")
+        logger.info(f"  -> Generated: {output_file.name} ({len(subtitles)} lines)")
 
 
-def main():
+def main() -> None:
     """主函数"""
-    # 获取项目根目录 (src 的上级目录)
-    project_root = Path(__file__).parent.parent.parent.parent
+    # 使用统一的路径管理
+    src_dir = get_subtitle_srt_dir()
+    txt_dir = get_subtitle_txt_dir()
 
-    src_dir = project_root / 'data' / 'subtitle' / 'srt'
-    txt_dir = project_root / 'data' / 'subtitle' / 'txt'
-
-    print(f"Source directory: {src_dir}")
-    print(f"Output directory: {txt_dir}")
-    print("-" * 50)
+    logger.info(f"Source directory: {src_dir}")
+    logger.info(f"Output directory: {txt_dir}")
+    logger.info("-" * 50)
 
     process_subtitle_files(src_dir, txt_dir)
 
-    print("-" * 50)
-    print("Done!")
+    logger.info("-" * 50)
+    logger.info("Done!")
 
 
 if __name__ == '__main__':

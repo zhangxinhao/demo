@@ -1,9 +1,10 @@
 """
 公共工具模块
-提供路径管理、配置管理、文件IO、日志等公共功能
+提供路径管理、配置管理、文件IO、日志、文本处理等公共功能
 """
 
 import logging
+import re
 import sys
 from pathlib import Path
 from typing import TypedDict
@@ -26,11 +27,11 @@ class AppConfig(TypedDict, total=False):
     num_threads: int
 
 
-# ============ 路径管理 ============
+# ============ 路径管理 - 基础 ============
 
 def get_project_root() -> Path:
     """获取项目根目录"""
-    # 从 src/book/utils.py 往上两级
+    # 从 src/llm_editor/utils.py 往上三级
     return Path(__file__).parent.parent.parent
 
 
@@ -38,6 +39,18 @@ def get_data_dir() -> Path:
     """获取 data 目录路径"""
     return get_project_root() / "data"
 
+
+def get_src_dir() -> Path:
+    """获取 src 目录"""
+    return get_project_root() / "src"
+
+
+def get_prompt_dir() -> Path:
+    """获取提示词目录 (data/prompt)"""
+    return get_data_dir() / "prompt"
+
+
+# ============ 路径管理 - Book 模块 ============
 
 def get_book_base_dir() -> Path:
     """获取 book 模块的基础目录 (data/book)"""
@@ -64,19 +77,48 @@ def get_catalog_dir() -> Path:
     return get_book_base_dir() / "catalog"
 
 
-def get_prompt_dir() -> Path:
-    """获取提示词目录 (data/prompt)"""
-    return get_data_dir() / "prompt"
-
-
 def get_md_output_dir() -> Path:
     """获取 MD 输出目录 (data/book/md)"""
     return get_book_base_dir() / "md"
 
 
-def get_src_dir() -> Path:
-    """获取 src 目录"""
-    return get_project_root() / "src"
+# ============ 路径管理 - Article 模块 ============
+
+def get_article_base_dir() -> Path:
+    """获取 article 模块的基础目录 (data/article)"""
+    return get_data_dir() / "article"
+
+
+def get_article_txt_dir() -> Path:
+    """获取 article txt 文件目录 (data/article/txt)"""
+    return get_article_base_dir() / "txt"
+
+
+def get_article_prompt_txt_dir() -> Path:
+    """获取 article prompt_txt 目录 (data/article/prompt_txt)"""
+    return get_article_base_dir() / "prompt_txt"
+
+
+def get_article_md_dir() -> Path:
+    """获取 article md 输出目录 (data/article/md)"""
+    return get_article_base_dir() / "md"
+
+
+# ============ 路径管理 - Subtitle 模块 ============
+
+def get_subtitle_base_dir() -> Path:
+    """获取 subtitle 模块的基础目录 (data/subtitle)"""
+    return get_data_dir() / "subtitle"
+
+
+def get_subtitle_srt_dir() -> Path:
+    """获取 subtitle srt 文件目录 (data/subtitle/srt)"""
+    return get_subtitle_base_dir() / "srt"
+
+
+def get_subtitle_txt_dir() -> Path:
+    """获取 subtitle txt 输出目录 (data/subtitle/txt)"""
+    return get_subtitle_base_dir() / "txt"
 
 
 # ============ 配置管理 ============
@@ -176,6 +218,66 @@ def ensure_dir(dir_path: Path) -> None:
         dir_path: 目录路径
     """
     dir_path.mkdir(parents=True, exist_ok=True)
+
+
+# ============ 文本处理 ============
+
+def is_chinese_document(text: str, threshold: float = 0.3) -> bool:
+    """
+    判断文档是否为中文文档
+    
+    通过计算中文字符占总字符的比例来判断
+    
+    Args:
+        text: 文本内容
+        threshold: 中文字符比例阈值，超过此值视为中文文档
+    
+    Returns:
+        True 表示中文文档，False 表示英文文档
+    """
+    if not text:
+        return False
+    
+    # 匹配中文字符（包括中文标点）
+    chinese_pattern = re.compile(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]')
+    chinese_chars = chinese_pattern.findall(text)
+    
+    # 计算中文字符比例
+    total_chars = len(text.replace(' ', '').replace('\n', ''))
+    if total_chars == 0:
+        return False
+    
+    chinese_ratio = len(chinese_chars) / total_chars
+    return chinese_ratio >= threshold
+
+
+def count_words(text: str) -> int:
+    """
+    统计英文文档的单词数
+    
+    Args:
+        text: 文本内容
+    
+    Returns:
+        单词数量
+    """
+    # 使用正则匹配单词（字母数字组成的序列）
+    words = re.findall(r'\b[a-zA-Z0-9]+\b', text)
+    return len(words)
+
+
+def count_chars(text: str) -> int:
+    """
+    统计中文文档的字符数（不含空白字符）
+    
+    Args:
+        text: 文本内容
+    
+    Returns:
+        字符数量
+    """
+    # 移除空白字符后计算长度
+    return len(text.replace(' ', '').replace('\n', '').replace('\t', ''))
 
 
 # ============ 日志管理 ============
