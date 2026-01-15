@@ -14,5 +14,5 @@ class PathType(Enum):
     ENV_FILE = f"{_DATA_ROOT}/.env"
     ENV_EXAMPLE_FILE = f"{_DATA_ROOT}/.env.example"
 
-    # FTP
-    FTP = f"{_DATA_ROOT}/ftp"
+    # SFTP
+    SFTP = f"{_DATA_ROOT}/sftp"
