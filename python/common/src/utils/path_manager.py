@@ -20,8 +20,8 @@ class PathManager:
     def _find_project_root(self) -> str:
         """查找项目根目录"""
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # 从utils向上3层到项目根目录
-        return os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+        # 从 src/utils 向上2层到项目根目录
+        return os.path.dirname(os.path.dirname(current_dir))
 
     def get_absolute_path(self, path: Union[str, Path]) -> str:
         """将路径转换为绝对路径"""
