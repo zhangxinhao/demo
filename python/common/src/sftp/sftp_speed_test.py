@@ -39,7 +39,7 @@ class SFTPSpeedTest:
         self._path_manager.ensure_dir_exists(PathType.SFTP)
 
         # 远程测试目录
-        self._remote_test_dir = "/tmp/sftp_speed_test"
+        self._remote_test_dir = "/data/sftp"
 
     def _validate_config(self) -> bool:
         """验证 SFTP 配置"""
