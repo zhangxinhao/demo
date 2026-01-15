@@ -1,4 +1,5 @@
 # python
+*.egg-info/
 .env
 
 /data/sftp/
