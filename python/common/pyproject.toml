@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pyftpdlib>=2.1.0",
+    "pysftp>=0.2.9",
     "python-dotenv>=1.2.1",
     "tqdm>=4.67.1",
 ]
