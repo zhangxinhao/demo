@@ -137,6 +137,19 @@ class HackMDClient:
         data = self._request("GET", "/notes")
         return [Note.from_dict(note) for note in data]
 
+    def get_notes_raw(self) -> list[dict]:
+        """
+        获取用户工作区的笔记列表（原始 JSON 格式）
+        
+        GET /notes
+        
+        Returns:
+            笔记列表的原始 dict 数据
+        """
+        logger.info("Getting notes list (raw)")
+        data = self._request("GET", "/notes")
+        return data
+
     def get_note(self, note_id: str) -> Note:
         """
         获取单个笔记详情
@@ -152,6 +165,22 @@ class HackMDClient:
         logger.info(f"Getting note: {note_id}")
         data = self._request("GET", f"/notes/{note_id}")
         return Note.from_dict(data)
+
+    def get_note_raw(self, note_id: str) -> dict:
+        """
+        获取单个笔记详情（原始 JSON 格式）
+        
+        GET /notes/:noteId
+        
+        Args:
+            note_id: 笔记 ID
+        
+        Returns:
+            笔记的原始 dict 数据
+        """
+        logger.info(f"Getting note (raw): {note_id}")
+        data = self._request("GET", f"/notes/{note_id}")
+        return data
 
     def create_note(self, request: Optional[CreateNoteRequest] = None) -> Note:
         """

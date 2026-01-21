@@ -36,6 +36,10 @@ class PathType(Enum):
     SUBTITLE_SRT = "data/subtitle/srt"
     SUBTITLE_TXT = "data/subtitle/txt"
 
+    # HackMD 模块相关目录
+    HACKMD_BASE = "data/hackmd"
+    HACKMD_NOTES = "data/hackmd/notes"
+
 
 class PathManager:
     """路径管理器"""
@@ -74,16 +78,18 @@ class PathManager:
             return path_str
         return os.path.join(self.project_root, path_str)
 
-    def get_path(self, path: Union[str, Path]) -> Path:
+    def get_path(self, path: Union[Path, PathType]) -> Path:
         """
         将路径转换为 Path 对象
 
         Args:
-            path: 相对或绝对路径
+            path: Path 对象或路径类型枚举
 
         Returns:
             Path 对象
         """
+        if isinstance(path, PathType):
+            return Path(self.get_dir(path))
         return Path(self.get_absolute_path(path))
 
     def get_dir(self, path_type: PathType) -> str:

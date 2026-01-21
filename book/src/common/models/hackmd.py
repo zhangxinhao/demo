@@ -108,6 +108,8 @@ class Note:
     title: str
     tags: Optional[list[str]] = None
     created_at: Optional[int] = None
+    title_updated_at: Optional[int] = None
+    tags_updated_at: Optional[int] = None
     publish_type: Optional[str] = None
     published_at: Optional[int] = None
     permalink: Optional[str] = None
@@ -133,6 +135,8 @@ class Note:
             title=data.get("title", ""),
             tags=data.get("tags"),
             created_at=data.get("createdAt"),
+            title_updated_at=data.get("titleUpdatedAt"),
+            tags_updated_at=data.get("tagsUpdatedAt"),
             publish_type=data.get("publishType"),
             published_at=data.get("publishedAt"),
             permalink=data.get("permalink"),
