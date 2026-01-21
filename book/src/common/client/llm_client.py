@@ -67,8 +67,7 @@ class LLMClient:
         settings = get_settings()
         
         api_key = settings.get(EnvVar.OPENROUTER_API_KEY)
-        # 优先使用 MODEL_NAME，兼容旧配置
-        model_name = settings.get(EnvVar.MODEL_NAME) or settings.get(EnvVar.LLM_MODEL)
+        model_name = settings.get(EnvVar.LLM_MODEL)
         base_url = settings.get(EnvVar.LLM_BASE_URL)
         
         if not api_key:

@@ -20,14 +20,10 @@ class EnvVar(Enum):
     格式: (key, default_value, type)
     """
     # API Keys
-    GEMINI_API_KEY = ("GEMINI_API_KEY", None, str)
-    DEEPSEEK_API_KEY = ("DEEPSEEK_API_KEY", None, str)
-    OPENAI_API_KEY = ("OPENAI_API_KEY", None, str)
     OPENROUTER_API_KEY = ("OPENROUTER_API_KEY", None, str)
 
     # LLM 配置
     LLM_MODEL = ("LLM_MODEL", "gemini-2.0-flash", str)
-    MODEL_NAME = ("MODEL_NAME", None, str)  # 兼容旧配置
     LLM_BASE_URL = ("LLM_BASE_URL", "https://openrouter.ai/api/v1", str)
 
     # 并发配置
@@ -94,26 +90,6 @@ class Settings:
         if value is None:
             return None
         return env_var.var_type(value)
-
-    def get_api_key(self, provider: str = "gemini") -> Optional[str]:
-        """
-        获取指定 LLM 提供商的 API Key
-
-        Args:
-            provider: 提供商名称 (gemini, deepseek, openai)
-
-        Returns:
-            API Key 或 None
-        """
-        key_map = {
-            "gemini": EnvVar.GEMINI_API_KEY,
-            "deepseek": EnvVar.DEEPSEEK_API_KEY,
-            "openai": EnvVar.OPENAI_API_KEY,
-        }
-        env_var = key_map.get(provider.lower())
-        if env_var:
-            return self.get(env_var)
-        return None
 
 
 # 全局单例
