@@ -33,6 +33,9 @@ class EnvVar(Enum):
     # 并发配置
     NUM_THREADS = ("NUM_THREADS", "4", int)
 
+    # HackMD 配置
+    HACKMD_API_TOKEN = ("HACKMD_API_TOKEN", None, str)
+
     @property
     def key(self) -> str:
         return self.value[0]
