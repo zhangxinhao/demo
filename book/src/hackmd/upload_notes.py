@@ -8,7 +8,7 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 from common import get_logger
 from common.client.hackmd_client import HackMDClient
@@ -23,6 +23,15 @@ class MdFile:
     """Markdown 文件信息"""
     path: Path  # 文件路径
     content: str  # 文件内容
+
+
+@dataclass
+class UploadResult:
+    """上传结果信息"""
+    filename: str  # 文件名（不含扩展名）
+    title: str  # 笔记标题
+    url: str  # 笔记 URL
+    directory: Path  # 所属目录
 
 
 def scan_md_files(directories: List[Path]) -> List[MdFile]:
@@ -82,6 +91,64 @@ def get_book_directories(book_names: List[str]) -> List[Path]:
     return [book_md_base / book_name for book_name in book_names]
 
 
+def get_sort_key(filename: str) -> tuple:
+    """
+    获取文件名的排序键
+    
+    排序规则：
+    1. 纯数字文件名按数字从小到大排序，放在最前面
+    2. 非数字文件名按字符串从小到大排序，放在后面
+    
+    Args:
+        filename: 文件名（不含扩展名）
+        
+    Returns:
+        排序键元组 (是否为非数字, 排序值)
+    """
+    # 检查是否为纯数字
+    if filename.isdigit():
+        return (0, int(filename), "")
+    else:
+        return (1, 0, filename)
+
+
+def generate_yaml_list(results: List[UploadResult]) -> str:
+    """
+    生成 YAML 格式的无序列表
+    
+    Args:
+        results: 上传结果列表
+        
+    Returns:
+        YAML 格式的字符串
+    """
+    if not results:
+        return ""
+
+    # 按目录分组
+    grouped: Dict[Path, List[UploadResult]] = {}
+    for result in results:
+        if result.directory not in grouped:
+            grouped[result.directory] = []
+        grouped[result.directory].append(result)
+
+    output_lines = []
+
+    # 遍历每个目录
+    for directory, dir_results in grouped.items():
+        # 对结果按文件名排序
+        sorted_results = sorted(dir_results, key=lambda r: get_sort_key(r.filename))
+
+        # 添加目录标题
+        output_lines.append(f"\n# {directory.name}")
+
+        # 生成无序列表
+        for result in sorted_results:
+            output_lines.append(f"- [{result.title}]({result.url})")
+
+    return "\n".join(output_lines)
+
+
 def upload_notes(directories: List[Path]) -> None:
     """
     上传笔记主函数
@@ -104,6 +171,9 @@ def upload_notes(directories: List[Path]) -> None:
     pm.ensure_dir_exists(PathType.HACKMD_NOTES)
     client = HackMDClient.from_settings()
 
+    # 收集上传结果
+    upload_results: List[UploadResult] = []
+
     # 上传每个文件
     for md_file in md_files:
         try:
@@ -123,6 +193,7 @@ def upload_notes(directories: List[Path]) -> None:
             logger.info(f"  shortId: {short_id}")
             logger.info(f"  title: {title}")
             logger.info(f"  URL: {url}")
+            logger.info(f"  Link: [{title}]({url})")
 
             # 保存到本地 JSON 文件
             output_path = pm.get_path(PathType.HACKMD_NOTES) / f"{short_id}.json"
@@ -159,8 +230,21 @@ def upload_notes(directories: List[Path]) -> None:
 
             logger.info(f"  Saved to: {output_path}")
 
+            # 收集上传结果
+            upload_results.append(UploadResult(
+                filename=md_file.path.stem,  # 文件名不含扩展名
+                title=title,
+                url=url,
+                directory=md_file.path.parent
+            ))
+
         except Exception as e:
             logger.error(f"Failed to upload {md_file.path.name}: {e}")
+
+    # 输出 YAML 格式列表
+    if upload_results:
+        yaml_list = generate_yaml_list(upload_results)
+        logger.info(f"\n{'=' * 50}\nYAML List:{yaml_list}\n{'=' * 50}")
 
 
 if __name__ == "__main__":
@@ -168,7 +252,7 @@ if __name__ == "__main__":
 
     # 书籍名称列表
     book_names = [
-        # "正念的奇迹",
+        # "正念-卡巴金",
     ]
 
     # 构建目录列表：PathType.ARTICLE_MD + book 目录
