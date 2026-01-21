@@ -11,6 +11,14 @@ books:
     add_prompt: true
     llm_process: true
     need_link: false
+  正念-卡巴金:
+    add_prompt: true
+    llm_process: true
+    need_link: false
+  正念的奇迹:
+    add_prompt: true
+    llm_process: true
+    need_link: false
   深入浅出软件架构:
     add_prompt: true
     llm_process: true
