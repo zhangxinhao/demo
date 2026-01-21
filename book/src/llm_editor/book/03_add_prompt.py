@@ -5,10 +5,8 @@
 
 from pathlib import Path
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.utils import (
-    get_txt_dir,
-    get_prompt_dir,
     load_config,
     save_config,
     read_file,
@@ -63,8 +61,9 @@ def process_book(book_dir: Path, prompt: str) -> tuple[int, dict[str, int]]:
 def main() -> None:
     """主函数"""
     # 路径配置
-    txt_base_dir = get_txt_dir()
-    prompt_dir = get_prompt_dir()
+    pm = get_path_manager()
+    txt_base_dir = pm.get_dir_path(PathType.BOOK_TXT)
+    prompt_dir = pm.get_dir_path(PathType.PROMPT)
     link_prompt_path = prompt_dir / "link.txt"
     nolink_prompt_path = prompt_dir / "nolink.txt"
 
@@ -109,7 +108,7 @@ def main() -> None:
         # 处理书籍
         count, char_counts = process_book(book_dir, prompt)
         logger.info(f"Processed {count} files for book: {book_name}")
-        
+
         # 打印每个文件的字符数量
         logger.info(f"Character counts for book '{book_name}':")
         for filename, char_count in char_counts.items():

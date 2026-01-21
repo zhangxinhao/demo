@@ -7,10 +7,8 @@
 import re
 from pathlib import Path
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.utils import (
-    get_subtitle_srt_dir,
-    get_subtitle_txt_dir,
     ensure_dir,
     write_file,
 )
@@ -90,12 +88,12 @@ def is_metadata_line(line: str, line_number: int) -> bool:
     # 前两行通常是标题和日期
     if line_number <= 2:
         return True
-    
+
     # 日期格式判断: 如 "2026年01月04日 20:20"
     date_pattern = r'^\d{4}年\d{2}月\d{2}日\s+\d+:\d+'
     if re.match(date_pattern, line.strip()):
         return True
-    
+
     return False
 
 
@@ -121,19 +119,19 @@ def extract_text_from_txt_subtitle(txt_path: Path) -> list[str]:
         for line in f:
             line_number += 1
             line = line.strip()
-            
+
             # 跳过空行
             if not line:
                 continue
-            
+
             # 跳过元数据行（标题、日期）
             if is_metadata_line(line, line_number):
                 continue
-            
+
             # 跳过发言人时间行
             if is_speaker_line(line):
                 continue
-            
+
             # 剩下的是字幕文本
             subtitles.append(line)
 
@@ -201,8 +199,9 @@ def process_subtitle_files(src_dir: Path, txt_dir: Path) -> None:
 def main() -> None:
     """主函数"""
     # 使用统一的路径管理
-    src_dir = get_subtitle_srt_dir()
-    txt_dir = get_subtitle_txt_dir()
+    pm = get_path_manager()
+    src_dir = pm.get_dir_path(PathType.SUBTITLE_SRT)
+    txt_dir = pm.get_dir_path(PathType.SUBTITLE_TXT)
 
     logger.info(f"Source directory: {src_dir}")
     logger.info(f"Output directory: {txt_dir}")

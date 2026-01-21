@@ -4,11 +4,9 @@
 在 data/book/md 目录下的同名目录中生成 catalog.md
 """
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.utils import (
     ensure_dir,
-    get_catalog_dir,
-    get_md_output_dir,
     read_lines,
     write_file,
 )
@@ -42,8 +40,9 @@ def build_catalog_for_book(book_name: str) -> bool:
     Returns:
         是否成功
     """
-    catalog_file = get_catalog_dir() / f"{book_name}.txt"
-    md_dir = get_md_output_dir() / book_name
+    pm = get_path_manager()
+    catalog_file = pm.get_dir_path(PathType.BOOK_CATALOG) / f"{book_name}.txt"
+    md_dir = pm.get_dir_path(PathType.BOOK_MD) / book_name
     output_file = md_dir / "catalog.md"
 
     # 检查目录文件是否存在
@@ -88,7 +87,7 @@ def build_all_catalogs() -> None:
     """
     为所有书籍构建目录
     """
-    catalog_dir = get_catalog_dir()
+    catalog_dir = get_path_manager().get_dir_path(PathType.BOOK_CATALOG)
 
     if not catalog_dir.exists():
         logger.error(f"Catalog directory not found: {catalog_dir}")

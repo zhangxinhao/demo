@@ -6,11 +6,9 @@
 
 from pathlib import Path
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.base import LLMClient, BatchFileProcessor, ProcessResult
 from llm_editor.utils import (
-    get_article_prompt_txt_dir,
-    get_article_md_dir,
     read_file,
     write_file,
 )
@@ -25,13 +23,13 @@ class ArticleLLMProcessor(BatchFileProcessor):
     
     继承 BatchFileProcessor，实现文章的批量 LLM 处理逻辑
     """
-    
+
     def __init__(
-        self,
-        llm_client: LLMClient,
-        input_dir: Path,
-        output_dir: Path,
-        num_threads: int = 2
+            self,
+            llm_client: LLMClient,
+            input_dir: Path,
+            output_dir: Path,
+            num_threads: int = 2
     ):
         """
         初始化文章处理器
@@ -44,7 +42,7 @@ class ArticleLLMProcessor(BatchFileProcessor):
         """
         super().__init__(input_dir, output_dir, num_threads, file_pattern="*.txt")
         self.llm_client = llm_client
-    
+
     def process_file(self, input_file: Path) -> ProcessResult:
         """
         处理单个文章文件
@@ -59,18 +57,18 @@ class ArticleLLMProcessor(BatchFileProcessor):
         try:
             # 读取文件内容作为提示词
             prompt = read_file(input_file)
-            
+
             logger.info(f"Processing file: {file_name}")
-            
+
             # 调用大模型
             response = self.llm_client.call(prompt, file_name)
-            
+
             # 保存结果到 md 文件
             output_file = self.output_dir / f"{input_file.stem}.md"
             write_file(output_file, response.content)
-            
+
             logger.info(f"Completed: {file_name} -> {output_file.name} (took {response.elapsed_time:.2f}s)")
-            
+
             return ProcessResult(
                 file_name=file_name,
                 success=True,
@@ -90,18 +88,19 @@ class ArticleLLMProcessor(BatchFileProcessor):
 def main() -> None:
     """主函数"""
     # 路径配置
-    input_dir = get_article_prompt_txt_dir()
-    output_dir = get_article_md_dir()
-    
+    pm = get_path_manager()
+    input_dir = pm.get_dir_path(PathType.ARTICLE_PROMPT_TXT)
+    output_dir = pm.get_dir_path(PathType.ARTICLE_MD)
+
     # 创建 LLM 客户端
     logger.info("Initializing LLM client...")
     llm_client = LLMClient.from_settings()
     num_threads = llm_client.get_num_threads()
-    
+
     logger.info(f"Input directory: {input_dir}")
     logger.info(f"Output directory: {output_dir}")
     logger.info(f"Using {num_threads} threads")
-    
+
     # 创建处理器并执行
     processor = ArticleLLMProcessor(
         llm_client=llm_client,
@@ -109,10 +108,10 @@ def main() -> None:
         output_dir=output_dir,
         num_threads=num_threads
     )
-    
+
     result = processor.run()
     result.log_summary("Articles")
-    
+
     if result.all_success:
         logger.info("All articles processed successfully!")
     else:

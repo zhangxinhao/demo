@@ -5,11 +5,8 @@
 import re
 from pathlib import Path
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.utils import (
-    get_book_dir,
-    get_catalog_dir,
-    get_txt_dir,
     read_file,
     read_lines,
     write_file,
@@ -114,13 +111,13 @@ def process_book(book_file: Path, catalog_dir: Path, output_base_dir: Path) -> b
         是否处理成功
     """
     book_name = book_file.stem  # 获取文件名（不含扩展名）
-    
+
     # 检查目标目录是否已存在，如果存在则跳过
     output_dir = output_base_dir / book_name
     if output_dir.exists():
         logger.info(f"Skipping {book_name}: output directory already exists")
         return False
-    
+
     logger.info(f"Processing book: {book_name}")
 
     # 获取目录文件
@@ -159,9 +156,10 @@ def process_book(book_file: Path, catalog_dir: Path, output_base_dir: Path) -> b
 def main() -> None:
     """主函数"""
     # 使用公共路径函数
-    book_dir = get_book_dir()
-    catalog_dir = get_catalog_dir()
-    output_dir = get_txt_dir()
+    pm = get_path_manager()
+    book_dir = pm.get_dir_path(PathType.BOOK_BOOK)
+    catalog_dir = pm.get_dir_path(PathType.BOOK_CATALOG)
+    output_dir = pm.get_dir_path(PathType.BOOK_TXT)
 
     logger.info(f"Book directory: {book_dir}")
     logger.info(f"Catalog directory: {catalog_dir}")

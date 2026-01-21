@@ -5,11 +5,9 @@
 
 from pathlib import Path
 
-from common import get_logger
+from common import get_logger, PathType, get_path_manager
 from llm_editor.base import LLMClient, BatchFileProcessor, ProcessResult
 from llm_editor.utils import (
-    get_txt_dir,
-    get_md_output_dir,
     load_config,
     save_config,
     read_file,
@@ -50,13 +48,13 @@ class BookLLMProcessor(BatchFileProcessor):
     
     继承 BatchFileProcessor，实现书籍章节的批量 LLM 处理逻辑
     """
-    
+
     def __init__(
-        self,
-        llm_client: LLMClient,
-        input_dir: Path,
-        output_dir: Path,
-        num_threads: int = 2
+            self,
+            llm_client: LLMClient,
+            input_dir: Path,
+            output_dir: Path,
+            num_threads: int = 2
     ):
         """
         初始化书籍处理器
@@ -69,7 +67,7 @@ class BookLLMProcessor(BatchFileProcessor):
         """
         super().__init__(input_dir, output_dir, num_threads, file_pattern="*.txt")
         self.llm_client = llm_client
-    
+
     def process_file(self, input_file: Path) -> ProcessResult:
         """
         处理单个书籍章节文件
@@ -84,18 +82,18 @@ class BookLLMProcessor(BatchFileProcessor):
         try:
             # 读取文件内容作为提示词
             prompt = read_file(input_file)
-            
+
             logger.info(f"Processing file: {file_name}")
-            
+
             # 调用大模型
             response = self.llm_client.call(prompt, file_name)
-            
+
             # 保存结果到 md 文件
             output_file = self.output_dir / f"{input_file.stem}.md"
             write_file(output_file, response.content)
-            
+
             logger.info(f"Completed: {file_name} -> {output_file.name} (took {response.elapsed_time:.2f}s)")
-            
+
             return ProcessResult(
                 file_name=file_name,
                 success=True,
@@ -113,11 +111,11 @@ class BookLLMProcessor(BatchFileProcessor):
 
 
 def process_book(
-    llm_client: LLMClient,
-    book_name: str,
-    txt_dir: Path,
-    output_base_dir: Path,
-    num_threads: int
+        llm_client: LLMClient,
+        book_name: str,
+        txt_dir: Path,
+        output_base_dir: Path,
+        num_threads: int
 ) -> bool:
     """
     处理单本书籍的所有章节
@@ -134,13 +132,13 @@ def process_book(
     """
     book_txt_dir = txt_dir / book_name
     output_dir = output_base_dir / book_name
-    
+
     if not book_txt_dir.exists():
         logger.warning(f"Directory not found for book '{book_name}': {book_txt_dir}")
         return False
-    
+
     logger.info(f"Processing book: {book_name}")
-    
+
     # 创建处理器并执行
     processor = BookLLMProcessor(
         llm_client=llm_client,
@@ -148,18 +146,19 @@ def process_book(
         output_dir=output_dir,
         num_threads=num_threads
     )
-    
+
     result = processor.run()
     result.log_summary(f"Book '{book_name}'")
-    
+
     return result.all_success
 
 
 def main() -> None:
     """主函数"""
     # 路径配置
-    txt_dir = get_txt_dir()
-    output_dir = get_md_output_dir()
+    pm = get_path_manager()
+    txt_dir = pm.get_dir_path(PathType.BOOK_TXT)
+    output_dir = pm.get_dir_path(PathType.BOOK_MD)
 
     # 创建 LLM 客户端
     logger.info("Initializing LLM client...")

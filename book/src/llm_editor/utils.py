@@ -30,100 +30,6 @@ class AppConfig(TypedDict, total=False):
     num_threads: int
 
 
-# ============ 路径便捷函数 ============
-# 这些函数封装了 PathManager，提供简洁的路径获取方式
-
-def get_project_root() -> Path:
-    """获取项目根目录"""
-    return Path(get_path_manager().project_root)
-
-
-def get_data_dir() -> Path:
-    """获取 data 目录路径"""
-    return get_path_manager().get_dir_path(PathType.DATA)
-
-
-def get_src_dir() -> Path:
-    """获取 src 目录"""
-    return get_project_root() / "src"
-
-
-def get_prompt_dir() -> Path:
-    """获取提示词目录 (data/prompt)"""
-    return get_path_manager().get_dir_path(PathType.PROMPT)
-
-
-# ============ Book 模块路径 ============
-
-def get_book_base_dir() -> Path:
-    """获取 book 模块的基础目录 (data/book)"""
-    return get_path_manager().get_dir_path(PathType.BOOK_BASE)
-
-
-def get_config_path() -> Path:
-    """获取配置文件路径 (data/book/config.yaml)"""
-    return get_book_base_dir() / "config.yaml"
-
-
-def get_txt_dir() -> Path:
-    """获取 txt 文件目录 (data/book/txt)"""
-    return get_path_manager().get_dir_path(PathType.BOOK_TXT)
-
-
-def get_book_dir() -> Path:
-    """获取书籍 MD 文件目录 (data/book/book)"""
-    return get_path_manager().get_dir_path(PathType.BOOK_BOOK)
-
-
-def get_catalog_dir() -> Path:
-    """获取目录文件目录 (data/book/catalog)"""
-    return get_path_manager().get_dir_path(PathType.BOOK_CATALOG)
-
-
-def get_md_output_dir() -> Path:
-    """获取 MD 输出目录 (data/book/md)"""
-    return get_path_manager().get_dir_path(PathType.BOOK_MD)
-
-
-# ============ Article 模块路径 ============
-
-def get_article_base_dir() -> Path:
-    """获取 article 模块的基础目录 (data/article)"""
-    return get_path_manager().get_dir_path(PathType.ARTICLE_BASE)
-
-
-def get_article_txt_dir() -> Path:
-    """获取 article txt 文件目录 (data/article/txt)"""
-    return get_path_manager().get_dir_path(PathType.ARTICLE_TXT)
-
-
-def get_article_prompt_txt_dir() -> Path:
-    """获取 article prompt_txt 目录 (data/article/prompt_txt)"""
-    return get_path_manager().get_dir_path(PathType.ARTICLE_PROMPT_TXT)
-
-
-def get_article_md_dir() -> Path:
-    """获取 article md 输出目录 (data/article/md)"""
-    return get_path_manager().get_dir_path(PathType.ARTICLE_MD)
-
-
-# ============ Subtitle 模块路径 ============
-
-def get_subtitle_base_dir() -> Path:
-    """获取 subtitle 模块的基础目录 (data/subtitle)"""
-    return get_path_manager().get_dir_path(PathType.SUBTITLE_BASE)
-
-
-def get_subtitle_srt_dir() -> Path:
-    """获取 subtitle srt 文件目录 (data/subtitle/srt)"""
-    return get_path_manager().get_dir_path(PathType.SUBTITLE_SRT)
-
-
-def get_subtitle_txt_dir() -> Path:
-    """获取 subtitle txt 输出目录 (data/subtitle/txt)"""
-    return get_path_manager().get_dir_path(PathType.SUBTITLE_TXT)
-
-
 # ============ 配置管理 ============
 
 def load_config(config_path: Path | None = None) -> AppConfig:
@@ -137,7 +43,7 @@ def load_config(config_path: Path | None = None) -> AppConfig:
         配置字典
     """
     if config_path is None:
-        config_path = get_config_path()
+        config_path = get_path_manager().get_dir_path(PathType.BOOK_BASE) / "config.yaml"
 
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -152,7 +58,7 @@ def save_config(config: AppConfig, config_path: Path | None = None) -> None:
         config_path: 配置文件路径，默认使用 data/book/config.yaml
     """
     if config_path is None:
-        config_path = get_config_path()
+        config_path = get_path_manager().get_dir_path(PathType.BOOK_BASE) / "config.yaml"
 
     with open(config_path, "w", encoding="utf-8") as f:
         yaml.dump(config, f, allow_unicode=True, default_flow_style=False)
