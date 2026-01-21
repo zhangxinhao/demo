@@ -163,7 +163,7 @@ def main() -> None:
 
     # 创建 LLM 客户端
     logger.info("Initializing LLM client...")
-    llm_client = LLMClient.from_env()
+    llm_client = LLMClient.from_settings()
 
     # 加载配置
     logger.info("Loading config...")

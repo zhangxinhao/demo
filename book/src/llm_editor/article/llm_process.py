@@ -95,7 +95,7 @@ def main() -> None:
     
     # 创建 LLM 客户端
     logger.info("Initializing LLM client...")
-    llm_client = LLMClient.from_env()
+    llm_client = LLMClient.from_settings()
     num_threads = llm_client.get_num_threads()
     
     logger.info(f"Input directory: {input_dir}")

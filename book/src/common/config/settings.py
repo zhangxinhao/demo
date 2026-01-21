@@ -23,10 +23,12 @@ class EnvVar(Enum):
     GEMINI_API_KEY = ("GEMINI_API_KEY", None, str)
     DEEPSEEK_API_KEY = ("DEEPSEEK_API_KEY", None, str)
     OPENAI_API_KEY = ("OPENAI_API_KEY", None, str)
+    OPENROUTER_API_KEY = ("OPENROUTER_API_KEY", None, str)
 
     # LLM 配置
     LLM_MODEL = ("LLM_MODEL", "gemini-2.0-flash", str)
-    LLM_BASE_URL = ("LLM_BASE_URL", None, str)
+    MODEL_NAME = ("MODEL_NAME", None, str)  # 兼容旧配置
+    LLM_BASE_URL = ("LLM_BASE_URL", "https://openrouter.ai/api/v1", str)
 
     # 并发配置
     NUM_THREADS = ("NUM_THREADS", "4", int)

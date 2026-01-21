@@ -2,7 +2,7 @@
 """
 公共模块
 
-提供路径管理、日志管理、配置管理等公共功能
+提供路径管理、日志管理、配置管理、客户端等公共功能
 """
 
 from common.utils import (
@@ -18,6 +18,10 @@ from common.config import (
     Settings,
     get_settings,
 )
+from common.client import (
+    LLMClient,
+    LLMResponse,
+)
 
 __all__ = [
     # 路径管理
@@ -32,4 +36,7 @@ __all__ = [
     "EnvVar",
     "Settings",
     "get_settings",
+    # 客户端
+    "LLMClient",
+    "LLMResponse",
 ]
