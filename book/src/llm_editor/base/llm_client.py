@@ -11,7 +11,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from llm_editor.utils import get_src_dir, get_logger
+from common import get_logger, get_path_manager
 
 logger = get_logger("llm_client")
 
@@ -70,7 +70,7 @@ class LLMClient:
             ValueError: 缺少必要的环境变量
         """
         if env_path is None:
-            env_path = get_src_dir() / ".env"
+            env_path = get_path_manager().get_path("src/.env")
         
         load_dotenv(env_path)
         
@@ -162,7 +162,7 @@ class LLMClient:
             线程数
         """
         if env_path is None:
-            env_path = get_src_dir() / ".env"
+            env_path = get_path_manager().get_path("src/.env")
         
         load_dotenv(env_path)
         

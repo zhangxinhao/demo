@@ -8,7 +8,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from llm_editor.utils import ensure_dir, get_logger
+from common import get_logger
+from llm_editor.utils import ensure_dir
 
 logger = get_logger("batch_processor")
 

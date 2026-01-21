@@ -5,6 +5,7 @@
 在文件末尾添加提示词后保存到 data/article/prompt_txt 目录
 """
 
+from common import get_logger
 from llm_editor.utils import (
     get_article_txt_dir,
     get_article_prompt_txt_dir,
@@ -15,7 +16,6 @@ from llm_editor.utils import (
     is_chinese_document,
     count_words,
     count_chars,
-    get_logger,
 )
 
 # 初始化 logger

@@ -1,15 +1,18 @@
+# -*- coding: utf-8 -*-
 """
-公共工具模块
-提供路径管理、配置管理、文件IO、日志、文本处理等公共功能
+LLM Editor 工具模块
+
+提供配置管理、文件IO、文本处理等业务相关功能
+路径管理、日志管理等通用功能已迁移至 common 模块
 """
 
-import logging
 import re
-import sys
 from pathlib import Path
 from typing import TypedDict
 
 import yaml
+
+from common import PathType, get_path_manager
 
 
 # ============ 类型定义 ============
@@ -27,17 +30,17 @@ class AppConfig(TypedDict, total=False):
     num_threads: int
 
 
-# ============ 路径管理 - 基础 ============
+# ============ 路径便捷函数 ============
+# 这些函数封装了 PathManager，提供简洁的路径获取方式
 
 def get_project_root() -> Path:
     """获取项目根目录"""
-    # 从 src/llm_editor/utils.py 往上三级
-    return Path(__file__).parent.parent.parent
+    return Path(get_path_manager().project_root)
 
 
 def get_data_dir() -> Path:
     """获取 data 目录路径"""
-    return get_project_root() / "data"
+    return get_path_manager().get_dir_path(PathType.DATA)
 
 
 def get_src_dir() -> Path:
@@ -47,14 +50,14 @@ def get_src_dir() -> Path:
 
 def get_prompt_dir() -> Path:
     """获取提示词目录 (data/prompt)"""
-    return get_data_dir() / "prompt"
+    return get_path_manager().get_dir_path(PathType.PROMPT)
 
 
-# ============ 路径管理 - Book 模块 ============
+# ============ Book 模块路径 ============
 
 def get_book_base_dir() -> Path:
     """获取 book 模块的基础目录 (data/book)"""
-    return get_data_dir() / "book"
+    return get_path_manager().get_dir_path(PathType.BOOK_BASE)
 
 
 def get_config_path() -> Path:
@@ -64,61 +67,61 @@ def get_config_path() -> Path:
 
 def get_txt_dir() -> Path:
     """获取 txt 文件目录 (data/book/txt)"""
-    return get_book_base_dir() / "txt"
+    return get_path_manager().get_dir_path(PathType.BOOK_TXT)
 
 
 def get_book_dir() -> Path:
     """获取书籍 MD 文件目录 (data/book/book)"""
-    return get_book_base_dir() / "book"
+    return get_path_manager().get_dir_path(PathType.BOOK_BOOK)
 
 
 def get_catalog_dir() -> Path:
     """获取目录文件目录 (data/book/catalog)"""
-    return get_book_base_dir() / "catalog"
+    return get_path_manager().get_dir_path(PathType.BOOK_CATALOG)
 
 
 def get_md_output_dir() -> Path:
     """获取 MD 输出目录 (data/book/md)"""
-    return get_book_base_dir() / "md"
+    return get_path_manager().get_dir_path(PathType.BOOK_MD)
 
 
-# ============ 路径管理 - Article 模块 ============
+# ============ Article 模块路径 ============
 
 def get_article_base_dir() -> Path:
     """获取 article 模块的基础目录 (data/article)"""
-    return get_data_dir() / "article"
+    return get_path_manager().get_dir_path(PathType.ARTICLE_BASE)
 
 
 def get_article_txt_dir() -> Path:
     """获取 article txt 文件目录 (data/article/txt)"""
-    return get_article_base_dir() / "txt"
+    return get_path_manager().get_dir_path(PathType.ARTICLE_TXT)
 
 
 def get_article_prompt_txt_dir() -> Path:
     """获取 article prompt_txt 目录 (data/article/prompt_txt)"""
-    return get_article_base_dir() / "prompt_txt"
+    return get_path_manager().get_dir_path(PathType.ARTICLE_PROMPT_TXT)
 
 
 def get_article_md_dir() -> Path:
     """获取 article md 输出目录 (data/article/md)"""
-    return get_article_base_dir() / "md"
+    return get_path_manager().get_dir_path(PathType.ARTICLE_MD)
 
 
-# ============ 路径管理 - Subtitle 模块 ============
+# ============ Subtitle 模块路径 ============
 
 def get_subtitle_base_dir() -> Path:
     """获取 subtitle 模块的基础目录 (data/subtitle)"""
-    return get_data_dir() / "subtitle"
+    return get_path_manager().get_dir_path(PathType.SUBTITLE_BASE)
 
 
 def get_subtitle_srt_dir() -> Path:
     """获取 subtitle srt 文件目录 (data/subtitle/srt)"""
-    return get_subtitle_base_dir() / "srt"
+    return get_path_manager().get_dir_path(PathType.SUBTITLE_SRT)
 
 
 def get_subtitle_txt_dir() -> Path:
     """获取 subtitle txt 输出目录 (data/subtitle/txt)"""
-    return get_subtitle_base_dir() / "txt"
+    return get_path_manager().get_dir_path(PathType.SUBTITLE_TXT)
 
 
 # ============ 配置管理 ============
@@ -126,10 +129,10 @@ def get_subtitle_txt_dir() -> Path:
 def load_config(config_path: Path | None = None) -> AppConfig:
     """
     加载配置文件
-    
+
     Args:
         config_path: 配置文件路径，默认使用 data/book/config.yaml
-    
+
     Returns:
         配置字典
     """
@@ -143,7 +146,7 @@ def load_config(config_path: Path | None = None) -> AppConfig:
 def save_config(config: AppConfig, config_path: Path | None = None) -> None:
     """
     保存配置文件
-    
+
     Args:
         config: 配置字典
         config_path: 配置文件路径，默认使用 data/book/config.yaml
@@ -160,10 +163,10 @@ def save_config(config: AppConfig, config_path: Path | None = None) -> None:
 def read_file(file_path: Path) -> str:
     """
     读取文件内容
-    
+
     Args:
         file_path: 文件路径
-    
+
     Returns:
         文件内容
     """
@@ -174,7 +177,7 @@ def read_file(file_path: Path) -> str:
 def write_file(file_path: Path, content: str) -> None:
     """
     写入文件内容
-    
+
     Args:
         file_path: 文件路径
         content: 文件内容
@@ -186,7 +189,7 @@ def write_file(file_path: Path, content: str) -> None:
 def append_file(file_path: Path, content: str) -> None:
     """
     追加文件内容
-    
+
     Args:
         file_path: 文件路径
         content: 追加的内容
@@ -198,10 +201,10 @@ def append_file(file_path: Path, content: str) -> None:
 def read_lines(file_path: Path) -> list[str]:
     """
     读取文件行（去除空行和空白）
-    
+
     Args:
         file_path: 文件路径
-    
+
     Returns:
         非空行列表
     """
@@ -213,7 +216,7 @@ def read_lines(file_path: Path) -> list[str]:
 def ensure_dir(dir_path: Path) -> None:
     """
     确保目录存在，不存在则创建
-    
+
     Args:
         dir_path: 目录路径
     """
@@ -225,28 +228,28 @@ def ensure_dir(dir_path: Path) -> None:
 def is_chinese_document(text: str, threshold: float = 0.3) -> bool:
     """
     判断文档是否为中文文档
-    
+
     通过计算中文字符占总字符的比例来判断
-    
+
     Args:
         text: 文本内容
         threshold: 中文字符比例阈值，超过此值视为中文文档
-    
+
     Returns:
         True 表示中文文档，False 表示英文文档
     """
     if not text:
         return False
-    
+
     # 匹配中文字符（包括中文标点）
     chinese_pattern = re.compile(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]')
     chinese_chars = chinese_pattern.findall(text)
-    
+
     # 计算中文字符比例
     total_chars = len(text.replace(' ', '').replace('\n', ''))
     if total_chars == 0:
         return False
-    
+
     chinese_ratio = len(chinese_chars) / total_chars
     return chinese_ratio >= threshold
 
@@ -254,10 +257,10 @@ def is_chinese_document(text: str, threshold: float = 0.3) -> bool:
 def count_words(text: str) -> int:
     """
     统计英文文档的单词数
-    
+
     Args:
         text: 文本内容
-    
+
     Returns:
         单词数量
     """
@@ -269,65 +272,12 @@ def count_words(text: str) -> int:
 def count_chars(text: str) -> int:
     """
     统计中文文档的字符数（不含空白字符）
-    
+
     Args:
         text: 文本内容
-    
+
     Returns:
         字符数量
     """
     # 移除空白字符后计算长度
     return len(text.replace(' ', '').replace('\n', '').replace('\t', ''))
-
-
-# ============ 日志管理 ============
-
-def setup_logger(
-        name: str,
-        level: int = logging.INFO,
-        format_str: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-) -> logging.Logger:
-    """
-    设置并返回 logger
-    
-    Args:
-        name: logger 名称
-        level: 日志级别
-        format_str: 日志格式
-    
-    Returns:
-        配置好的 logger
-    """
-    logger = logging.getLogger(name)
-
-    # 避免重复添加 handler
-    if not logger.handlers:
-        logger.setLevel(level)
-
-        # 控制台 handler
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(level)
-
-        # 设置格式
-        formatter = logging.Formatter(format_str)
-        console_handler.setFormatter(formatter)
-
-        logger.addHandler(console_handler)
-
-    return logger
-
-
-def get_logger(name: str) -> logging.Logger:
-    """
-    获取已配置的 logger，如果不存在则创建
-    
-    Args:
-        name: logger 名称
-    
-    Returns:
-        logger 实例
-    """
-    logger = logging.getLogger(name)
-    if not logger.handlers:
-        return setup_logger(name)
-    return logger

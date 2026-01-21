@@ -5,6 +5,7 @@
 
 from pathlib import Path
 
+from common import get_logger
 from llm_editor.utils import (
     get_txt_dir,
     get_prompt_dir,
@@ -12,7 +13,6 @@ from llm_editor.utils import (
     save_config,
     read_file,
     append_file,
-    get_logger,
     AppConfig,
 )
 

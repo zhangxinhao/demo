@@ -7,12 +7,12 @@
 import re
 from pathlib import Path
 
+from common import get_logger
 from llm_editor.utils import (
     get_subtitle_srt_dir,
     get_subtitle_txt_dir,
     ensure_dir,
     write_file,
-    get_logger,
 )
 
 logger = get_logger("subtitle_extract")

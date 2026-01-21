@@ -7,12 +7,12 @@
 3. 删除 data/article/md 目录下所有的 md 文件
 """
 
+from common import get_logger
 from llm_editor.utils import (
     get_article_txt_dir,
     get_article_prompt_txt_dir,
     get_article_md_dir,
     write_file,
-    get_logger,
 )
 
 # 初始化 logger

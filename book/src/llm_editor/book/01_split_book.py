@@ -5,6 +5,7 @@
 import re
 from pathlib import Path
 
+from common import get_logger
 from llm_editor.utils import (
     get_book_dir,
     get_catalog_dir,
@@ -13,7 +14,6 @@ from llm_editor.utils import (
     read_lines,
     write_file,
     ensure_dir,
-    get_logger,
 )
 
 # 初始化 logger

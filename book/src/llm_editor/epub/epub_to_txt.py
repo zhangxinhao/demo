@@ -10,11 +10,11 @@ import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
 
+from common import get_logger
 from llm_editor.utils import (
     get_data_dir,
     ensure_dir,
     write_file,
-    get_logger,
 )
 
 logger = get_logger(__name__)

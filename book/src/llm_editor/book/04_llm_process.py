@@ -5,6 +5,7 @@
 
 from pathlib import Path
 
+from common import get_logger
 from llm_editor.base import LLMClient, BatchFileProcessor, ProcessResult
 from llm_editor.utils import (
     get_txt_dir,
@@ -13,7 +14,6 @@ from llm_editor.utils import (
     save_config,
     read_file,
     write_file,
-    get_logger,
     AppConfig,
     BookConfig,
 )
