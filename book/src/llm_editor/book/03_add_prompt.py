@@ -12,50 +12,61 @@ from llm_editor.utils import (
     read_file,
     append_file,
     AppConfig,
+    is_chinese_document,
+    count_words,
+    count_chars,
 )
 
 # 初始化 logger
 logger = get_logger("add_prompt")
 
 
-def append_prompt_to_file(file_path: Path, prompt: str) -> int:
+def append_prompt_to_file(file_path: Path, prompt: str, is_chinese: bool) -> tuple[int, int]:
     """
     在文件末尾追加提示词
     
     Args:
         file_path: 文件路径
         prompt: 提示词内容
+        is_chinese: 是否为中文文档
     
     Returns:
-        添加提示词后文件的字符数量
+        (字符数, 词数) 元组
     """
     append_file(file_path, prompt)
-    # 读取文件内容并计算字符数
+    # 读取文件内容并计算字符数/词数
     content = read_file(file_path)
-    char_count = len(content)
-    logger.info(f"Added prompt to: {file_path}, character count: {char_count}")
-    return char_count
+    char_count = count_chars(content)
+    word_count = count_words(content)
+    
+    if is_chinese:
+        logger.info(f"Added prompt to: {file_path}, chars: {char_count}")
+    else:
+        logger.info(f"Added prompt to: {file_path}, words: {word_count}")
+    
+    return char_count, word_count
 
 
-def process_book(book_dir: Path, prompt: str) -> tuple[int, dict[str, int]]:
+def process_book(book_dir: Path, prompt: str, is_chinese: bool) -> tuple[int, dict[str, tuple[int, int]], bool]:
     """
     处理单本书的所有txt文件
     
     Args:
         book_dir: 书籍目录
         prompt: 提示词内容
+        is_chinese: 是否为中文文档
     
     Returns:
-        (处理的文件数量, 文件字符数统计字典)
+        (处理的文件数量, 文件统计字典{文件名: (字符数, 词数)}, 是否为中文)
     """
     processed_count = 0
-    char_counts: dict[str, int] = {}
+    file_stats: dict[str, tuple[int, int]] = {}
     # 遍历书籍目录下的所有txt文件
     for txt_file in sorted(book_dir.glob("*.txt")):
-        char_count = append_prompt_to_file(txt_file, prompt)
-        char_counts[txt_file.name] = char_count
+        char_count, word_count = append_prompt_to_file(txt_file, prompt, is_chinese)
+        file_stats[txt_file.name] = (char_count, word_count)
         processed_count += 1
-    return processed_count, char_counts
+    return processed_count, file_stats, is_chinese
 
 
 def main() -> None:
@@ -105,14 +116,30 @@ def main() -> None:
 
         logger.info(f"Processing book: {book_name} (need_link: {need_link})")
 
+        # 读取第一个文件判断是中文还是英文文档
+        txt_files = sorted(book_dir.glob("*.txt"))
+        if not txt_files:
+            logger.warning(f"No txt files found in: {book_dir}")
+            continue
+        
+        first_file_content = read_file(txt_files[0])
+        is_chinese = is_chinese_document(first_file_content)
+        lang = "Chinese" if is_chinese else "English"
+        logger.info(f"Document language: {lang}")
+
         # 处理书籍
-        count, char_counts = process_book(book_dir, prompt)
+        count, file_stats, is_chinese = process_book(book_dir, prompt, is_chinese)
         logger.info(f"Processed {count} files for book: {book_name}")
 
-        # 打印每个文件的字符数量
-        logger.info(f"Character counts for book '{book_name}':")
-        for filename, char_count in char_counts.items():
-            logger.info(f"  {filename}: {char_count} characters")
+        # 打印每个文件的统计信息（中文显示字符数，英文显示词数）
+        if is_chinese:
+            logger.info(f"Character counts for book '{book_name}':")
+            for filename, (char_count, _) in file_stats.items():
+                logger.info(f"  {filename}: {char_count} chars")
+        else:
+            logger.info(f"Word counts for book '{book_name}':")
+            for filename, (_, word_count) in file_stats.items():
+                logger.info(f"  {filename}: {word_count} words")
 
         # 记录已处理的书籍
         books_processed.append(book_name)

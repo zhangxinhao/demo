@@ -1,4 +1,8 @@
 books:
+  Claude宪法:
+    add_prompt: true
+    llm_process: false
+    need_link: false
   一句顶一万句:
     add_prompt: true
     llm_process: true
@@ -34,9 +38,5 @@ books:
   自控力:
     add_prompt: true
     llm_process: true
-    need_link: false
-  Claude宪法:
-    add_prompt: false
-    llm_process: false
     need_link: false
 num_threads: 4
