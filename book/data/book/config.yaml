@@ -35,4 +35,8 @@ books:
     add_prompt: true
     llm_process: true
     need_link: false
-num_threads: 2
+  Claude宪法:
+    add_prompt: false
+    llm_process: false
+    need_link: false
+num_threads: 4
