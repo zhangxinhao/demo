@@ -1,7 +1,7 @@
 books:
   Claude宪法:
     add_prompt: true
-    llm_process: false
+    llm_process: true
     need_link: false
   一句顶一万句:
     add_prompt: true
